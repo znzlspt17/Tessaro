@@ -1,0 +1,38 @@
+{
+  "intent": "a와 b 중 정확히 하나만 참인지 반환한다.",
+  "name": "Exclusive",
+  "params": [
+    {
+      "name": "a",
+      "type": "bool"
+    },
+    {
+      "name": "b",
+      "type": "bool"
+    }
+  ],
+  "return_type": "bool",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        false,
+        false
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        false,
+        true
+      ],
+      "want": true
+    }
+  ]
+}

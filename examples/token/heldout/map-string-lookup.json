@@ -1,0 +1,39 @@
+[
+  {
+    "inputs": {
+      "m": {
+        "z": "yes"
+      },
+      "key": "z"
+    },
+    "want": "yes"
+  },
+  {
+    "inputs": {
+      "m": {
+        "a": "a"
+      },
+      "key": "z"
+    },
+    "want": ""
+  },
+  {
+    "inputs": {
+      "m": {
+        "q": "go"
+      },
+      "key": "q"
+    },
+    "want": "go"
+  },
+  {
+    "inputs": {
+      "m": {
+        "a": "one",
+        "b": "two"
+      },
+      "key": "b"
+    },
+    "want": "two"
+  }
+]

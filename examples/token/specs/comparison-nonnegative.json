@@ -1,0 +1,53 @@
+{
+  "intent": "정수 x가 0 이상인지 반환한다.",
+  "inputs": [
+    "x"
+  ],
+  "allowed_types": [
+    "int",
+    "bool"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "x": -3
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "x": 2
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "x": 0
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "x": 1
+      },
+      "want": true
+    }
+  ],
+  "type_hints": {
+    "x": "int"
+  },
+  "output_type_hint": "bool",
+  "validation_mode": "sampled_holdout"
+}

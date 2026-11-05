@@ -1,0 +1,52 @@
+{
+  "intent": "flag가 참일 때만 x를 1 증가시키고 그 값을 반환한다.",
+  "name": "ConditionalUpdate",
+  "params": [
+    {
+      "name": "flag",
+      "type": "bool"
+    },
+    {
+      "name": "x",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        false,
+        -3
+      ],
+      "want": -3
+    },
+    {
+      "args": [
+        true,
+        2
+      ],
+      "want": 3
+    },
+    {
+      "args": [
+        false,
+        0
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        true,
+        1
+      ],
+      "want": 2
+    }
+  ]
+}

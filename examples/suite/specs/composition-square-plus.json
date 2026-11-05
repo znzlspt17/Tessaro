@@ -1,0 +1,52 @@
+{
+  "intent": "a의 제곱에 b를 더해 반환한다.",
+  "name": "SquarePlus",
+  "params": [
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        2,
+        3
+      ],
+      "want": 7
+    },
+    {
+      "args": [
+        -2,
+        1
+      ],
+      "want": 5
+    },
+    {
+      "args": [
+        0,
+        0
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        5,
+        -3
+      ],
+      "want": 22
+    }
+  ]
+}

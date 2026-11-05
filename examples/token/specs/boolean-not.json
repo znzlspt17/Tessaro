@@ -1,0 +1,40 @@
+{
+  "intent": "불리언 flag의 반대를 반환한다.",
+  "inputs": [
+    "flag"
+  ],
+  "allowed_types": [
+    "bool"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "flag": false
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "flag": true
+      },
+      "want": false
+    }
+  ],
+  "type_hints": {
+    "flag": "bool"
+  },
+  "output_type_hint": "bool",
+  "validation_mode": "exhaustive_public"
+}

@@ -1,0 +1,60 @@
+{
+  "intent": "a를 보관하고 flag가 참이면 반전한다. 거짓이면 b와 논리곱한다. 최종 값을 반환한다.",
+  "name": "BooleanUpdate",
+  "params": [
+    {
+      "name": "flag",
+      "type": "bool"
+    },
+    {
+      "name": "a",
+      "type": "bool"
+    },
+    {
+      "name": "b",
+      "type": "bool"
+    }
+  ],
+  "return_type": "bool",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        false,
+        false,
+        false
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        false,
+        false,
+        true
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        false,
+        true,
+        false
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        false,
+        true,
+        true
+      ],
+      "want": true
+    }
+  ]
+}

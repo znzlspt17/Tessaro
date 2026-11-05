@@ -1,0 +1,65 @@
+{
+  "intent": "a와 b를 보관한다. flag가 참이면 a를 a+b로 바꾸고, 거짓이면 b를 b-a로 바꾼 뒤 두 값의 합을 반환한다.",
+  "inputs": [
+    "flag",
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "bool",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "flag": false,
+        "a": 2,
+        "b": 3
+      },
+      "want": 3
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": -2,
+        "b": 1
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "flag": false,
+        "a": 0,
+        "b": 0
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": 5,
+        "b": -3
+      },
+      "want": -1
+    }
+  ],
+  "type_hints": {
+    "flag": "bool",
+    "a": "int",
+    "b": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

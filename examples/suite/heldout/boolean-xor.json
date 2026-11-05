@@ -1,0 +1,16 @@
+[
+  {
+    "args": [
+      true,
+      false
+    ],
+    "want": true
+  },
+  {
+    "args": [
+      true,
+      true
+    ],
+    "want": false
+  }
+]

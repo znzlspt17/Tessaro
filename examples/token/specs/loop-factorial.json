@@ -1,0 +1,50 @@
+{
+  "intent": "0 이상 정수 n의 팩토리얼을 반환한다.",
+  "inputs": [
+    "n"
+  ],
+  "allowed_types": [
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "n": 0
+      },
+      "want": 1
+    },
+    {
+      "inputs": {
+        "n": 1
+      },
+      "want": 1
+    },
+    {
+      "inputs": {
+        "n": 2
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "n": 3
+      },
+      "want": 6
+    }
+  ],
+  "type_hints": {
+    "n": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

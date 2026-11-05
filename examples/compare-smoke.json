@@ -1,0 +1,11 @@
+{
+  "engine": "ast",
+  "models": [{"id": "fake", "ranker": "fake"}],
+  "problems": [
+    {"id": "identity", "spec": "identity.json", "heldout": "identity.heldout.json"},
+    {"id": "add", "spec": "add.json", "heldout": "add.heldout.json"}
+  ],
+  "strategies": ["greedy", "beam", "strict-greedy"],
+  "repeats": 1,
+  "seed": 42
+}

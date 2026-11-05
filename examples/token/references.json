@@ -1,0 +1,237 @@
+[
+  {
+    "id": "arithmetic-add",
+    "spec": "specs/arithmetic-add.json",
+    "heldout": "heldout/arithmetic-add.json",
+    "source": "package main\nfunc f0(a int, b int) int { return a + b }"
+  },
+  {
+    "id": "arithmetic-subtract",
+    "spec": "specs/arithmetic-subtract.json",
+    "heldout": "heldout/arithmetic-subtract.json",
+    "source": "package main\nfunc f0(a int, b int) int { return a - b }"
+  },
+  {
+    "id": "arithmetic-multiply",
+    "spec": "specs/arithmetic-multiply.json",
+    "heldout": "heldout/arithmetic-multiply.json",
+    "source": "package main\nfunc f0(a int, b int) int { return a * b }"
+  },
+  {
+    "id": "arithmetic-quotient",
+    "spec": "specs/arithmetic-quotient.json",
+    "heldout": "heldout/arithmetic-quotient.json",
+    "source": "package main\nfunc f0(a int, b int) int { return a / b }"
+  },
+  {
+    "id": "comparison-less",
+    "spec": "specs/comparison-less.json",
+    "heldout": "heldout/comparison-less.json",
+    "source": "package main\nfunc f0(a int, b int) bool { return a < b }"
+  },
+  {
+    "id": "comparison-greater",
+    "spec": "specs/comparison-greater.json",
+    "heldout": "heldout/comparison-greater.json",
+    "source": "package main\nfunc f0(a int, b int) bool { return a > b }"
+  },
+  {
+    "id": "comparison-equal",
+    "spec": "specs/comparison-equal.json",
+    "heldout": "heldout/comparison-equal.json",
+    "source": "package main\nfunc f0(a int, b int) bool { return a == b }"
+  },
+  {
+    "id": "comparison-nonnegative",
+    "spec": "specs/comparison-nonnegative.json",
+    "heldout": "heldout/comparison-nonnegative.json",
+    "source": "package main\nfunc f0(x int) bool { return x >= 0 }"
+  },
+  {
+    "id": "boolean-not",
+    "spec": "specs/boolean-not.json",
+    "source": "package main\nfunc f0(flag bool) bool { return !flag }"
+  },
+  {
+    "id": "boolean-and",
+    "spec": "specs/boolean-and.json",
+    "source": "package main\nfunc f0(a bool, b bool) bool { return a && b }"
+  },
+  {
+    "id": "boolean-or",
+    "spec": "specs/boolean-or.json",
+    "source": "package main\nfunc f0(a bool, b bool) bool { return a || b }"
+  },
+  {
+    "id": "boolean-xor",
+    "spec": "specs/boolean-xor.json",
+    "source": "package main\nfunc f0(a bool, b bool) bool { return (a || b) && !(a && b) }"
+  },
+  {
+    "id": "conditional-abs",
+    "spec": "specs/conditional-abs.json",
+    "heldout": "heldout/conditional-abs.json",
+    "source": "package main\nfunc f0(x int) int { if x < 0 { return 0 - x } else { return x } }"
+  },
+  {
+    "id": "conditional-max",
+    "spec": "specs/conditional-max.json",
+    "heldout": "heldout/conditional-max.json",
+    "source": "package main\nfunc f0(a int, b int) int { if a > b { return a } else { return b } }"
+  },
+  {
+    "id": "conditional-min",
+    "spec": "specs/conditional-min.json",
+    "heldout": "heldout/conditional-min.json",
+    "source": "package main\nfunc f0(a int, b int) int { if a < b { return a } else { return b } }"
+  },
+  {
+    "id": "conditional-clamp",
+    "spec": "specs/conditional-clamp.json",
+    "heldout": "heldout/conditional-clamp.json",
+    "source": "package main\nfunc f0(x int) int { if x < -2 { return -2 } else { if x > 2 { return 2 } else { return x } } }"
+  },
+  {
+    "id": "composition-affine",
+    "spec": "specs/composition-affine.json",
+    "heldout": "heldout/composition-affine.json",
+    "source": "package main\nfunc f0(x int) int { return x * 2 + 1 }"
+  },
+  {
+    "id": "composition-square-plus",
+    "spec": "specs/composition-square-plus.json",
+    "heldout": "heldout/composition-square-plus.json",
+    "source": "package main\nfunc f0(a int, b int) int { return a * a + b }"
+  },
+  {
+    "id": "composition-sum-three",
+    "spec": "specs/composition-sum-three.json",
+    "heldout": "heldout/composition-sum-three.json",
+    "source": "package main\nfunc f0(a int, b int, c int) int { return a + b + c }"
+  },
+  {
+    "id": "composition-difference-product",
+    "spec": "specs/composition-difference-product.json",
+    "heldout": "heldout/composition-difference-product.json",
+    "source": "package main\nfunc f0(a int, b int, c int) int { return (a - b) * c }"
+  },
+  {
+    "id": "scope-branch-local",
+    "spec": "specs/scope-branch-local.json",
+    "heldout": "heldout/scope-branch-local.json",
+    "source": "package main\nfunc f0(flag bool, a int, b int) int { if flag { v0 := a + b; return v0 * 2 } else { v1 := a - b; return v1 * 2 } }"
+  },
+  {
+    "id": "scope-conditional-update",
+    "spec": "specs/scope-conditional-update.json",
+    "heldout": "heldout/scope-conditional-update.json",
+    "source": "package main\nfunc f0(flag bool, x int) int { v0 := x; if flag { v0 = v0 + 1 } else { v0 = v0 }; return v0 }"
+  },
+  {
+    "id": "scope-two-locals",
+    "spec": "specs/scope-two-locals.json",
+    "heldout": "heldout/scope-two-locals.json",
+    "source": "package main\nfunc f0(flag bool, a int, b int) int { v0 := a; v1 := b; if flag { v0 = v0 + v1 } else { v1 = v1 - v0 }; return v0 + v1 }"
+  },
+  {
+    "id": "scope-boolean-update",
+    "spec": "specs/scope-boolean-update.json",
+    "source": "package main\nfunc f0(flag bool, a bool, b bool) bool { v0 := a; if flag { v0 = !v0 } else { v0 = v0 && b }; return v0 }"
+  },
+  {
+    "id": "string-length",
+    "spec": "specs/string-length.json",
+    "heldout": "heldout/string-length.json",
+    "source": "package main\nfunc f0(s string) int { return len(s) }"
+  },
+  {
+    "id": "string-first-byte",
+    "spec": "specs/string-first-byte.json",
+    "heldout": "heldout/string-first-byte.json",
+    "source": "package main\nfunc f0(s string) int { return int(s[0]) }"
+  },
+  {
+    "id": "string-concat",
+    "spec": "specs/string-concat.json",
+    "heldout": "heldout/string-concat.json",
+    "source": "package main\nfunc f0(a string, b string) string { return a+b }"
+  },
+  {
+    "id": "string-equal",
+    "spec": "specs/string-equal.json",
+    "heldout": "heldout/string-equal.json",
+    "source": "package main\nfunc f0(a string, b string) bool { return a==b }"
+  },
+  {
+    "id": "slice-sum",
+    "spec": "specs/slice-sum.json",
+    "heldout": "heldout/slice-sum.json",
+    "source": "package main\nfunc f0(xs []int) int { sum := 0; for _,v := range xs { sum += v }; return sum }"
+  },
+  {
+    "id": "slice-positive-count",
+    "spec": "specs/slice-positive-count.json",
+    "heldout": "heldout/slice-positive-count.json",
+    "source": "package main\nfunc f0(xs []int) int { n := 0; for _,v := range xs { if v > 0 { n++ } }; return n }"
+  },
+  {
+    "id": "slice-string-count",
+    "spec": "specs/slice-string-count.json",
+    "heldout": "heldout/slice-string-count.json",
+    "source": "package main\nfunc f0(xs []string, target string) int { n := 0; for _,v := range xs { if v == target { n++ } }; return n }"
+  },
+  {
+    "id": "slice-reverse",
+    "spec": "specs/slice-reverse.json",
+    "heldout": "heldout/slice-reverse.json",
+    "source": "package main\nfunc f0(xs []int) []int { out := make([]int,len(xs)); for i,v := range xs { out[len(xs)-1-i] = v }; return out }"
+  },
+  {
+    "id": "map-int-lookup",
+    "spec": "specs/map-int-lookup.json",
+    "heldout": "heldout/map-int-lookup.json",
+    "source": "package main\nfunc f0(m map[string]int, key string) int { return m[key] }"
+  },
+  {
+    "id": "map-int-sum",
+    "spec": "specs/map-int-sum.json",
+    "heldout": "heldout/map-int-sum.json",
+    "source": "package main\nfunc f0(m map[string]int) int { sum := 0; for _,v := range m { sum += v }; return sum }"
+  },
+  {
+    "id": "map-string-lookup",
+    "spec": "specs/map-string-lookup.json",
+    "heldout": "heldout/map-string-lookup.json",
+    "source": "package main\nfunc f0(m map[string]string, key string) string { return m[key] }"
+  },
+  {
+    "id": "map-remove-zero",
+    "spec": "specs/map-remove-zero.json",
+    "heldout": "heldout/map-remove-zero.json",
+    "source": "package main\nfunc f0(m map[string]int) map[string]int { for k,v := range m { if v == 0 { delete(m,k) } }; return m }"
+  },
+  {
+    "id": "identity",
+    "spec": "specs/identity.json",
+    "heldout": "heldout/identity.json",
+    "source": "package main\nfunc f0(n int) int { v := 0; for i := 0; i < n; i++ { v++ }; return v }"
+  },
+  {
+    "id": "loop-factorial",
+    "spec": "specs/loop-factorial.json",
+    "heldout": "heldout/loop-factorial.json",
+    "source": "package main\nfunc f0(n int) int { out := 1; for i := 2; i <= n; i++ { out *= i }; return out }"
+  },
+  {
+    "id": "loop-sum-to-n",
+    "spec": "specs/loop-sum-to-n.json",
+    "heldout": "heldout/loop-sum-to-n.json",
+    "source": "package main\nfunc f0(n int) int { sum := 0; for i := 1; i <= n; i++ { sum += i }; return sum }"
+  },
+  {
+    "id": "loop-count-even",
+    "spec": "specs/loop-count-even.json",
+    "heldout": "heldout/loop-count-even.json",
+    "source": "package main\nfunc f0(xs []int) int { n := 0; for _,v := range xs { if v % 2 == 0 { n++ } }; return n }"
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "intent": "정수 x의 절댓값을 반환한다. 최소 int 값은 입력에서 제외한다.",
+  "inputs": [
+    "x"
+  ],
+  "allowed_types": [
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "x": -3
+      },
+      "want": 3
+    },
+    {
+      "inputs": {
+        "x": 2
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "x": 0
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "x": 1
+      },
+      "want": 1
+    }
+  ],
+  "type_hints": {
+    "x": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

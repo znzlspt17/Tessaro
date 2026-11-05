@@ -1,0 +1,66 @@
+[
+  {
+    "args": [
+      false,
+      11,
+      4
+    ],
+    "want": 14
+  },
+  {
+    "args": [
+      true,
+      -7,
+      -2
+    ],
+    "want": -18
+  },
+  {
+    "args": [
+      false,
+      0,
+      9
+    ],
+    "want": -18
+  },
+  {
+    "args": [
+      true,
+      9,
+      0
+    ],
+    "want": 18
+  },
+  {
+    "args": [
+      false,
+      -8,
+      3
+    ],
+    "want": -22
+  },
+  {
+    "args": [
+      true,
+      1,
+      1
+    ],
+    "want": 4
+  },
+  {
+    "args": [
+      false,
+      -1,
+      -1
+    ],
+    "want": 0
+  },
+  {
+    "args": [
+      true,
+      6,
+      -4
+    ],
+    "want": 4
+  }
+]

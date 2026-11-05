@@ -1,0 +1,60 @@
+{
+  "intent": "a와 b를 보관한다. flag가 참이면 a를 a+b로 바꾸고, 거짓이면 b를 b-a로 바꾼 뒤 두 값의 합을 반환한다.",
+  "name": "TwoLocals",
+  "params": [
+    {
+      "name": "flag",
+      "type": "bool"
+    },
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        false,
+        2,
+        3
+      ],
+      "want": 3
+    },
+    {
+      "args": [
+        true,
+        -2,
+        1
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        false,
+        0,
+        0
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        true,
+        5,
+        -3
+      ],
+      "want": -1
+    }
+  ]
+}

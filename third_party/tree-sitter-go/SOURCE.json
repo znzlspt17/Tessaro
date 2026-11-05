@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/tree-sitter/tree-sitter-go",
+  "revision": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7",
+  "files": {
+    "grammar.json": {
+      "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-go/2346a3ab1bb3857b48b29d779a1ef9799a248cd7/src/grammar.json",
+      "sha256": "0dcc665aa521a1b73a200be13b4e376780cca037d764a165f12864babfe28000"
+    },
+    "node-types.json": {
+      "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-go/2346a3ab1bb3857b48b29d779a1ef9799a248cd7/src/node-types.json",
+      "sha256": "8d77e723df0f0dfccb66d4571a5c3c17ecfb6c90959044c0992146b21f383bff"
+    },
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-go/2346a3ab1bb3857b48b29d779a1ef9799a248cd7/LICENSE",
+      "sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1"
+    }
+  }
+}

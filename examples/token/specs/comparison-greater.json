@@ -1,0 +1,59 @@
+{
+  "intent": "a가 b보다 큰지 반환한다.",
+  "inputs": [
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "int",
+    "bool"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "a": 2,
+        "b": 3
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "a": -2,
+        "b": 1
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "a": 0,
+        "b": 0
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "a": 5,
+        "b": -3
+      },
+      "want": true
+    }
+  ],
+  "type_hints": {
+    "a": "int",
+    "b": "int"
+  },
+  "output_type_hint": "bool",
+  "validation_mode": "sampled_holdout"
+}

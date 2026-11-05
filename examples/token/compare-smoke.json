@@ -1,0 +1,28 @@
+{
+  "engine": "token",
+  "models": [
+    {
+      "id": "fake",
+      "ranker": "fake"
+    }
+  ],
+  "problems": [
+    {
+      "id": "arithmetic-subtract",
+      "spec": "specs/arithmetic-subtract.json",
+      "heldout": "heldout/arithmetic-subtract.json"
+    },
+    {
+      "id": "identity",
+      "spec": "specs/identity.json",
+      "heldout": "heldout/identity.json"
+    }
+  ],
+  "strategies": [
+    "greedy",
+    "beam",
+    "strict-greedy"
+  ],
+  "repeats": 1,
+  "seed": 42
+}

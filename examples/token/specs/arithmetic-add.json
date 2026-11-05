@@ -1,0 +1,58 @@
+{
+  "intent": "두 정수 a와 b의 합을 반환한다.",
+  "inputs": [
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "a": 2,
+        "b": 3
+      },
+      "want": 5
+    },
+    {
+      "inputs": {
+        "a": -2,
+        "b": 1
+      },
+      "want": -1
+    },
+    {
+      "inputs": {
+        "a": 0,
+        "b": 0
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "a": 5,
+        "b": -3
+      },
+      "want": 2
+    }
+  ],
+  "type_hints": {
+    "a": "int",
+    "b": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "inputs": {
+      "a": 11,
+      "b": 4
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": -7,
+      "b": -2
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": 0,
+      "b": 9
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": 9,
+      "b": 0
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": -8,
+      "b": 3
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": 1,
+      "b": 1
+    },
+    "want": true
+  },
+  {
+    "inputs": {
+      "a": -1,
+      "b": -1
+    },
+    "want": true
+  },
+  {
+    "inputs": {
+      "a": 6,
+      "b": -4
+    },
+    "want": false
+  }
+]

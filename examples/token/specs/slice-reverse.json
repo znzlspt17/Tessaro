@@ -1,0 +1,67 @@
+{
+  "intent": "정수 배열을 역순의 새 배열로 반환한다.",
+  "inputs": [
+    "xs"
+  ],
+  "allowed_types": [
+    "[]int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "xs": [
+          1,
+          2,
+          3
+        ]
+      },
+      "want": [
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "inputs": {
+        "xs": []
+      },
+      "want": []
+    },
+    {
+      "inputs": {
+        "xs": [
+          1
+        ]
+      },
+      "want": [
+        1
+      ]
+    },
+    {
+      "inputs": {
+        "xs": [
+          -1,
+          2
+        ]
+      },
+      "want": [
+        2,
+        -1
+      ]
+    }
+  ],
+  "type_hints": {
+    "xs": "[]int"
+  },
+  "output_type_hint": "[]int",
+  "validation_mode": "sampled_holdout"
+}

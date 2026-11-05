@@ -1,0 +1,30 @@
+[
+  {
+    "inputs": {
+      "a": "go",
+      "b": "go"
+    },
+    "want": true
+  },
+  {
+    "inputs": {
+      "a": "go",
+      "b": "Go"
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": "",
+      "b": "x"
+    },
+    "want": false
+  },
+  {
+    "inputs": {
+      "a": "한",
+      "b": "한"
+    },
+    "want": true
+  }
+]

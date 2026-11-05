@@ -1,0 +1,26 @@
+[
+  {
+    "inputs": {
+      "s": "abc"
+    },
+    "want": 3
+  },
+  {
+    "inputs": {
+      "s": "test"
+    },
+    "want": 4
+  },
+  {
+    "inputs": {
+      "s": "hi!"
+    },
+    "want": 3
+  },
+  {
+    "inputs": {
+      "s": "나무"
+    },
+    "want": 6
+  }
+]

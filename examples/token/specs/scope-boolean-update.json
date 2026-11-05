@@ -1,0 +1,96 @@
+{
+  "intent": "a를 보관하고 flag가 참이면 반전한다. 거짓이면 b와 논리곱한다. 최종 값을 반환한다.",
+  "inputs": [
+    "flag",
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "bool"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "flag": false,
+        "a": false,
+        "b": false
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": false,
+        "b": false
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "flag": false,
+        "a": true,
+        "b": false
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": true,
+        "b": false
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "flag": false,
+        "a": false,
+        "b": true
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": false,
+        "b": true
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "flag": false,
+        "a": true,
+        "b": true
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": true,
+        "b": true
+      },
+      "want": false
+    }
+  ],
+  "type_hints": {
+    "flag": "bool",
+    "a": "bool",
+    "b": "bool"
+  },
+  "output_type_hint": "bool",
+  "validation_mode": "exhaustive_public"
+}

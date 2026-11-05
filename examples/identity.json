@@ -1,0 +1,8 @@
+{
+  "intent": "입력 정수 x를 그대로 반환한다.",
+  "name": "Identity",
+  "params": [{"name": "x", "type": "int"}],
+  "return_type": "int",
+  "constants": [0, 1],
+  "public_tests": [{"args": [3], "want": 3}, {"args": [-2], "want": -2}]
+}

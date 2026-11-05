@@ -1,0 +1,58 @@
+{
+  "intent": "a와 b 중 정확히 하나만 참인지 반환한다.",
+  "inputs": [
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "bool"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "a": false,
+        "b": false
+      },
+      "want": false
+    },
+    {
+      "inputs": {
+        "a": true,
+        "b": false
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "a": false,
+        "b": true
+      },
+      "want": true
+    },
+    {
+      "inputs": {
+        "a": true,
+        "b": true
+      },
+      "want": false
+    }
+  ],
+  "type_hints": {
+    "a": "bool",
+    "b": "bool"
+  },
+  "output_type_hint": "bool",
+  "validation_mode": "exhaustive_public"
+}

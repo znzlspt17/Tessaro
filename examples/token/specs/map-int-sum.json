@@ -1,0 +1,58 @@
+{
+  "intent": "정수 맵에 저장된 값을 모두 더한다.",
+  "inputs": [
+    "m"
+  ],
+  "allowed_types": [
+    "map[string]int",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "m": {
+          "a": 1,
+          "b": 2
+        }
+      },
+      "want": 3
+    },
+    {
+      "inputs": {
+        "m": {}
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "m": {
+          "a": -1
+        }
+      },
+      "want": -1
+    },
+    {
+      "inputs": {
+        "m": {
+          "x": 2,
+          "y": -2
+        }
+      },
+      "want": 0
+    }
+  ],
+  "type_hints": {
+    "m": "map[string]int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "inputs": {
+      "flag": false,
+      "x": -17
+    },
+    "want": -17
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "x": 24
+    },
+    "want": 25
+  },
+  {
+    "inputs": {
+      "flag": false,
+      "x": -1
+    },
+    "want": -1
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "x": 9
+    },
+    "want": 10
+  },
+  {
+    "inputs": {
+      "flag": false,
+      "x": -8
+    },
+    "want": -8
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "x": 11
+    },
+    "want": 12
+  },
+  {
+    "inputs": {
+      "flag": false,
+      "x": -2
+    },
+    "want": -2
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "x": 3
+    },
+    "want": 4
+  }
+]

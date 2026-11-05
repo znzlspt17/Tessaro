@@ -1,0 +1,52 @@
+{
+  "intent": "두 정수 a와 b가 같은지 반환한다.",
+  "name": "Equal",
+  "params": [
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    }
+  ],
+  "return_type": "bool",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        2,
+        3
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        -2,
+        1
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        0,
+        0
+      ],
+      "want": true
+    },
+    {
+      "args": [
+        5,
+        -3
+      ],
+      "want": false
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "intent": "두 정수 a와 b의 곱을 반환한다.",
+  "name": "Product",
+  "params": [
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        2,
+        3
+      ],
+      "want": 6
+    },
+    {
+      "args": [
+        -2,
+        1
+      ],
+      "want": -2
+    },
+    {
+      "args": [
+        0,
+        0
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        5,
+        -3
+      ],
+      "want": -15
+    }
+  ]
+}

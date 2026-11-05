@@ -1,0 +1,60 @@
+{
+  "intent": "flag가 참이면 a+b, 거짓이면 a-b를 구한 후 2배를 반환한다.",
+  "name": "BranchLocal",
+  "params": [
+    {
+      "name": "flag",
+      "type": "bool"
+    },
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        false,
+        2,
+        3
+      ],
+      "want": -2
+    },
+    {
+      "args": [
+        true,
+        -2,
+        1
+      ],
+      "want": -2
+    },
+    {
+      "args": [
+        false,
+        0,
+        0
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        true,
+        5,
+        -3
+      ],
+      "want": 4
+    }
+  ]
+}

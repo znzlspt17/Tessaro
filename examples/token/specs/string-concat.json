@@ -1,0 +1,55 @@
+{
+  "intent": "두 문자열을 순서대로 이어 붙인다.",
+  "inputs": [
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "string"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "a": "a",
+        "b": "b"
+      },
+      "want": "ab"
+    },
+    {
+      "inputs": {
+        "a": "go",
+        "b": "lang"
+      },
+      "want": "golang"
+    },
+    {
+      "inputs": {
+        "a": "",
+        "b": "x"
+      },
+      "want": "x"
+    },
+    {
+      "inputs": {
+        "a": "a",
+        "b": ""
+      },
+      "want": "a"
+    }
+  ],
+  "type_hints": {
+    "a": "string",
+    "b": "string"
+  },
+  "output_type_hint": "string",
+  "validation_mode": "sampled_holdout"
+}

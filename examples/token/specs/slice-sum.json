@@ -1,0 +1,59 @@
+{
+  "intent": "정수 배열 원소를 합산한다.",
+  "inputs": [
+    "xs"
+  ],
+  "allowed_types": [
+    "[]int",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "xs": [
+          1,
+          2,
+          3
+        ]
+      },
+      "want": 6
+    },
+    {
+      "inputs": {
+        "xs": [
+          0
+        ]
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "xs": [
+          -1,
+          3
+        ]
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "xs": []
+      },
+      "want": 0
+    }
+  ],
+  "type_hints": {
+    "xs": "[]int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

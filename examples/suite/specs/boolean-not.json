@@ -1,0 +1,26 @@
+{
+  "intent": "불리언 flag의 반대를 반환한다.",
+  "name": "Negation",
+  "params": [
+    {
+      "name": "flag",
+      "type": "bool"
+    }
+  ],
+  "return_type": "bool",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        false
+      ],
+      "want": true
+    }
+  ]
+}

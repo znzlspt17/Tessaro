@@ -1,0 +1,146 @@
+[
+  {
+    "id": "arithmetic-add",
+    "spec": "specs/arithmetic-add.json",
+    "heldout": "heldout/arithmetic-add.json",
+    "body": "return a + b"
+  },
+  {
+    "id": "arithmetic-subtract",
+    "spec": "specs/arithmetic-subtract.json",
+    "heldout": "heldout/arithmetic-subtract.json",
+    "body": "return a - b"
+  },
+  {
+    "id": "arithmetic-multiply",
+    "spec": "specs/arithmetic-multiply.json",
+    "heldout": "heldout/arithmetic-multiply.json",
+    "body": "return a * b"
+  },
+  {
+    "id": "arithmetic-quotient",
+    "spec": "specs/arithmetic-quotient.json",
+    "heldout": "heldout/arithmetic-quotient.json",
+    "body": "return a / b"
+  },
+  {
+    "id": "comparison-less",
+    "spec": "specs/comparison-less.json",
+    "heldout": "heldout/comparison-less.json",
+    "body": "return a < b"
+  },
+  {
+    "id": "comparison-greater",
+    "spec": "specs/comparison-greater.json",
+    "heldout": "heldout/comparison-greater.json",
+    "body": "return a > b"
+  },
+  {
+    "id": "comparison-equal",
+    "spec": "specs/comparison-equal.json",
+    "heldout": "heldout/comparison-equal.json",
+    "body": "return a == b"
+  },
+  {
+    "id": "comparison-nonnegative",
+    "spec": "specs/comparison-nonnegative.json",
+    "heldout": "heldout/comparison-nonnegative.json",
+    "body": "return x >= 0"
+  },
+  {
+    "id": "boolean-not",
+    "spec": "specs/boolean-not.json",
+    "heldout": "heldout/boolean-not.json",
+    "body": "return !flag"
+  },
+  {
+    "id": "boolean-and",
+    "spec": "specs/boolean-and.json",
+    "heldout": "heldout/boolean-and.json",
+    "body": "return a && b"
+  },
+  {
+    "id": "boolean-or",
+    "spec": "specs/boolean-or.json",
+    "heldout": "heldout/boolean-or.json",
+    "body": "return a || b"
+  },
+  {
+    "id": "boolean-xor",
+    "spec": "specs/boolean-xor.json",
+    "heldout": "heldout/boolean-xor.json",
+    "body": "return (a || b) && !(a && b)"
+  },
+  {
+    "id": "conditional-abs",
+    "spec": "specs/conditional-abs.json",
+    "heldout": "heldout/conditional-abs.json",
+    "body": "if x < 0 { return 0 - x } else { return x }"
+  },
+  {
+    "id": "conditional-max",
+    "spec": "specs/conditional-max.json",
+    "heldout": "heldout/conditional-max.json",
+    "body": "if a > b { return a } else { return b }"
+  },
+  {
+    "id": "conditional-min",
+    "spec": "specs/conditional-min.json",
+    "heldout": "heldout/conditional-min.json",
+    "body": "if a < b { return a } else { return b }"
+  },
+  {
+    "id": "conditional-clamp",
+    "spec": "specs/conditional-clamp.json",
+    "heldout": "heldout/conditional-clamp.json",
+    "body": "if x < -2 { return -2 } else { if x > 2 { return 2 } else { return x } }"
+  },
+  {
+    "id": "composition-affine",
+    "spec": "specs/composition-affine.json",
+    "heldout": "heldout/composition-affine.json",
+    "body": "return x * 2 + 1"
+  },
+  {
+    "id": "composition-square-plus",
+    "spec": "specs/composition-square-plus.json",
+    "heldout": "heldout/composition-square-plus.json",
+    "body": "return a * a + b"
+  },
+  {
+    "id": "composition-sum-three",
+    "spec": "specs/composition-sum-three.json",
+    "heldout": "heldout/composition-sum-three.json",
+    "body": "return a + b + c"
+  },
+  {
+    "id": "composition-difference-product",
+    "spec": "specs/composition-difference-product.json",
+    "heldout": "heldout/composition-difference-product.json",
+    "body": "return (a - b) * c"
+  },
+  {
+    "id": "scope-branch-local",
+    "spec": "specs/scope-branch-local.json",
+    "heldout": "heldout/scope-branch-local.json",
+    "body": "if flag { v0 := a + b; return v0 * 2 } else { v1 := a - b; return v1 * 2 }"
+  },
+  {
+    "id": "scope-conditional-update",
+    "spec": "specs/scope-conditional-update.json",
+    "heldout": "heldout/scope-conditional-update.json",
+    "body": "v0 := x; if flag { v0 = v0 + 1 } else { v0 = v0 }; return v0"
+  },
+  {
+    "id": "scope-two-locals",
+    "spec": "specs/scope-two-locals.json",
+    "heldout": "heldout/scope-two-locals.json",
+    "body": "v0 := a; v1 := b; if flag { v0 = v0 + v1 } else { v1 = v1 - v0 }; return v0 + v1"
+  },
+  {
+    "id": "scope-boolean-update",
+    "spec": "specs/scope-boolean-update.json",
+    "heldout": "heldout/scope-boolean-update.json",
+    "body": "v0 := a; if flag { v0 = !v0 } else { v0 = v0 && b }; return v0"
+  }
+]

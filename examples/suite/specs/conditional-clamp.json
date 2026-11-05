@@ -1,0 +1,44 @@
+{
+  "intent": "x를 -2 이상 2 이하로 제한한다.",
+  "name": "Clamp",
+  "params": [
+    {
+      "name": "x",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        -3
+      ],
+      "want": -2
+    },
+    {
+      "args": [
+        2
+      ],
+      "want": 2
+    },
+    {
+      "args": [
+        0
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        1
+      ],
+      "want": 1
+    }
+  ]
+}

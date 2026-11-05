@@ -1,0 +1,140 @@
+﻿{
+  "engine": "ast",
+    "models":  [
+                   {
+                       "key_env":  "TYPESAFE_API_KEY",
+                       "model":  "jev-1.14.0",
+                       "ranker":  "jev",
+                       "id":  "jev"
+                   }
+               ],
+    "problems":  [
+                     {
+                         "id":  "arithmetic-add",
+                         "spec":  "suite/specs/arithmetic-add.json",
+                         "heldout":  "suite/heldout/arithmetic-add.json"
+                     },
+                     {
+                         "id":  "arithmetic-subtract",
+                         "spec":  "suite/specs/arithmetic-subtract.json",
+                         "heldout":  "suite/heldout/arithmetic-subtract.json"
+                     },
+                     {
+                         "id":  "arithmetic-multiply",
+                         "spec":  "suite/specs/arithmetic-multiply.json",
+                         "heldout":  "suite/heldout/arithmetic-multiply.json"
+                     },
+                     {
+                         "id":  "arithmetic-quotient",
+                         "spec":  "suite/specs/arithmetic-quotient.json",
+                         "heldout":  "suite/heldout/arithmetic-quotient.json"
+                     },
+                     {
+                         "id":  "comparison-less",
+                         "spec":  "suite/specs/comparison-less.json",
+                         "heldout":  "suite/heldout/comparison-less.json"
+                     },
+                     {
+                         "id":  "comparison-greater",
+                         "spec":  "suite/specs/comparison-greater.json",
+                         "heldout":  "suite/heldout/comparison-greater.json"
+                     },
+                     {
+                         "id":  "comparison-equal",
+                         "spec":  "suite/specs/comparison-equal.json",
+                         "heldout":  "suite/heldout/comparison-equal.json"
+                     },
+                     {
+                         "id":  "comparison-nonnegative",
+                         "spec":  "suite/specs/comparison-nonnegative.json",
+                         "heldout":  "suite/heldout/comparison-nonnegative.json"
+                     },
+                     {
+                         "id":  "boolean-not",
+                         "spec":  "suite/specs/boolean-not.json",
+                         "heldout":  "suite/heldout/boolean-not.json"
+                     },
+                     {
+                         "id":  "boolean-and",
+                         "spec":  "suite/specs/boolean-and.json",
+                         "heldout":  "suite/heldout/boolean-and.json"
+                     },
+                     {
+                         "id":  "boolean-or",
+                         "spec":  "suite/specs/boolean-or.json",
+                         "heldout":  "suite/heldout/boolean-or.json"
+                     },
+                     {
+                         "id":  "boolean-xor",
+                         "spec":  "suite/specs/boolean-xor.json",
+                         "heldout":  "suite/heldout/boolean-xor.json"
+                     },
+                     {
+                         "id":  "conditional-abs",
+                         "spec":  "suite/specs/conditional-abs.json",
+                         "heldout":  "suite/heldout/conditional-abs.json"
+                     },
+                     {
+                         "id":  "conditional-max",
+                         "spec":  "suite/specs/conditional-max.json",
+                         "heldout":  "suite/heldout/conditional-max.json"
+                     },
+                     {
+                         "id":  "conditional-min",
+                         "spec":  "suite/specs/conditional-min.json",
+                         "heldout":  "suite/heldout/conditional-min.json"
+                     },
+                     {
+                         "id":  "conditional-clamp",
+                         "spec":  "suite/specs/conditional-clamp.json",
+                         "heldout":  "suite/heldout/conditional-clamp.json"
+                     },
+                     {
+                         "id":  "composition-affine",
+                         "spec":  "suite/specs/composition-affine.json",
+                         "heldout":  "suite/heldout/composition-affine.json"
+                     },
+                     {
+                         "id":  "composition-square-plus",
+                         "spec":  "suite/specs/composition-square-plus.json",
+                         "heldout":  "suite/heldout/composition-square-plus.json"
+                     },
+                     {
+                         "id":  "composition-sum-three",
+                         "spec":  "suite/specs/composition-sum-three.json",
+                         "heldout":  "suite/heldout/composition-sum-three.json"
+                     },
+                     {
+                         "id":  "composition-difference-product",
+                         "spec":  "suite/specs/composition-difference-product.json",
+                         "heldout":  "suite/heldout/composition-difference-product.json"
+                     },
+                     {
+                         "id":  "scope-branch-local",
+                         "spec":  "suite/specs/scope-branch-local.json",
+                         "heldout":  "suite/heldout/scope-branch-local.json"
+                     },
+                     {
+                         "id":  "scope-conditional-update",
+                         "spec":  "suite/specs/scope-conditional-update.json",
+                         "heldout":  "suite/heldout/scope-conditional-update.json"
+                     },
+                     {
+                         "id":  "scope-two-locals",
+                         "spec":  "suite/specs/scope-two-locals.json",
+                         "heldout":  "suite/heldout/scope-two-locals.json"
+                     },
+                     {
+                         "id":  "scope-boolean-update",
+                         "spec":  "suite/specs/scope-boolean-update.json",
+                         "heldout":  "suite/heldout/scope-boolean-update.json"
+                     }
+                 ],
+    "strategies":  [
+                       "greedy",
+                       "beam",
+                       "strict-greedy"
+                   ],
+    "repeats":  1,
+    "seed":  42
+}

@@ -1,0 +1,61 @@
+{
+  "intent": "정수 배열에서 짝수 원소 수를 반환한다.",
+  "inputs": [
+    "xs"
+  ],
+  "allowed_types": [
+    "[]int",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "xs": [
+          1,
+          2,
+          3
+        ]
+      },
+      "want": 1
+    },
+    {
+      "inputs": {
+        "xs": [
+          0,
+          -2
+        ]
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "xs": []
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "xs": [
+          1,
+          3
+        ]
+      },
+      "want": 0
+    }
+  ],
+  "type_hints": {
+    "xs": "[]int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

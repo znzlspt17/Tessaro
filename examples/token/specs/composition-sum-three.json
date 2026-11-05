@@ -1,0 +1,64 @@
+{
+  "intent": "a, b, c 세 정수의 합을 반환한다.",
+  "inputs": [
+    "a",
+    "b",
+    "c"
+  ],
+  "allowed_types": [
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "a": 2,
+        "b": 3,
+        "c": 1
+      },
+      "want": 6
+    },
+    {
+      "inputs": {
+        "a": -2,
+        "b": 1,
+        "c": 2
+      },
+      "want": 1
+    },
+    {
+      "inputs": {
+        "a": 0,
+        "b": 0,
+        "c": 3
+      },
+      "want": 3
+    },
+    {
+      "inputs": {
+        "a": 5,
+        "b": -3,
+        "c": -1
+      },
+      "want": 1
+    }
+  ],
+  "type_hints": {
+    "a": "int",
+    "b": "int",
+    "c": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

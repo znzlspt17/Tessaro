@@ -1,0 +1,50 @@
+{
+  "intent": "비어 있지 않은 문자열의 첫 바이트를 정수로 반환한다.",
+  "inputs": [
+    "s"
+  ],
+  "allowed_types": [
+    "string",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "s": "a"
+      },
+      "want": 97
+    },
+    {
+      "inputs": {
+        "s": "Go"
+      },
+      "want": 71
+    },
+    {
+      "inputs": {
+        "s": "0"
+      },
+      "want": 48
+    },
+    {
+      "inputs": {
+        "s": "한"
+      },
+      "want": 237
+    }
+  ],
+  "type_hints": {
+    "s": "string"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

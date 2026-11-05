@@ -1,0 +1,27 @@
+{
+  "problems": [
+    {
+      "id": "integer-addition",
+      "intent": "두 정수 a와 b의 합을 반환하는 Go 표현식을 고른다.",
+      "candidates": [
+        {"id": "add", "code": "a + b"},
+        {"id": "multiply", "code": "a * b"},
+        {"id": "subtract", "code": "a - b"},
+        {"id": "divide", "code": "a / b"}
+      ],
+      "answers": ["add"]
+    },
+    {
+      "id": "positive-check",
+      "intent": "정수 x가 0보다 큰지 판단하는 Go 표현식을 고른다.",
+      "candidates": [
+        {"id": "positive", "code": "x > 0"},
+        {"id": "reversed", "code": "0 < x"},
+        {"id": "nonnegative", "code": "x >= 0"},
+        {"id": "negative", "code": "x < 0"},
+        {"id": "zero", "code": "x == 0"}
+      ],
+      "answers": ["positive", "reversed"]
+    }
+  ]
+}

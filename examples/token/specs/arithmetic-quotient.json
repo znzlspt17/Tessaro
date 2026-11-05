@@ -1,0 +1,58 @@
+{
+  "intent": "0이 아닌 b로 a를 나눈 정수 몫을 반환한다. Go처럼 0 방향으로 버린다.",
+  "inputs": [
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "a": 8,
+        "b": 3
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "a": -8,
+        "b": 3
+      },
+      "want": -2
+    },
+    {
+      "inputs": {
+        "a": 8,
+        "b": -3
+      },
+      "want": -2
+    },
+    {
+      "inputs": {
+        "a": -8,
+        "b": -3
+      },
+      "want": 2
+    }
+  ],
+  "type_hints": {
+    "a": "int",
+    "b": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

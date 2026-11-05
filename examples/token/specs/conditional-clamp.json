@@ -1,0 +1,52 @@
+{
+  "intent": "x를 -2 이상 2 이하로 제한한다.",
+  "inputs": [
+    "x"
+  ],
+  "allowed_types": [
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "x": -3
+      },
+      "want": -2
+    },
+    {
+      "inputs": {
+        "x": 2
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "x": 0
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "x": 1
+      },
+      "want": 1
+    }
+  ],
+  "type_hints": {
+    "x": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

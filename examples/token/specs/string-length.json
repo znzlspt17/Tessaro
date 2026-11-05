@@ -1,0 +1,50 @@
+{
+  "intent": "문자열의 바이트 길이를 반환한다.",
+  "inputs": [
+    "s"
+  ],
+  "allowed_types": [
+    "string",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "s": ""
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "s": "go"
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "s": "hello"
+      },
+      "want": 5
+    },
+    {
+      "inputs": {
+        "s": "한"
+      },
+      "want": 3
+    }
+  ],
+  "type_hints": {
+    "s": "string"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

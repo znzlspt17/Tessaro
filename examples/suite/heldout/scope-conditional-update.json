@@ -1,0 +1,58 @@
+[
+  {
+    "args": [
+      false,
+      -17
+    ],
+    "want": -17
+  },
+  {
+    "args": [
+      true,
+      24
+    ],
+    "want": 25
+  },
+  {
+    "args": [
+      false,
+      -1
+    ],
+    "want": -1
+  },
+  {
+    "args": [
+      true,
+      9
+    ],
+    "want": 10
+  },
+  {
+    "args": [
+      false,
+      -8
+    ],
+    "want": -8
+  },
+  {
+    "args": [
+      true,
+      11
+    ],
+    "want": 12
+  },
+  {
+    "args": [
+      false,
+      -2
+    ],
+    "want": -2
+  },
+  {
+    "args": [
+      true,
+      3
+    ],
+    "want": 4
+  }
+]

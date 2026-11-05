@@ -1,0 +1,60 @@
+{
+  "intent": "a에서 b를 뺀 값에 c를 곱해 반환한다.",
+  "name": "DifferenceProduct",
+  "params": [
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    },
+    {
+      "name": "c",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        2,
+        3,
+        1
+      ],
+      "want": -1
+    },
+    {
+      "args": [
+        -2,
+        1,
+        2
+      ],
+      "want": -6
+    },
+    {
+      "args": [
+        0,
+        0,
+        3
+      ],
+      "want": 0
+    },
+    {
+      "args": [
+        5,
+        -3,
+        -1
+      ],
+      "want": -8
+    }
+  ]
+}

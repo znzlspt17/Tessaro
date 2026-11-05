@@ -1,0 +1,60 @@
+{
+  "intent": "a, b, c 세 정수의 합을 반환한다.",
+  "name": "SumThree",
+  "params": [
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    },
+    {
+      "name": "c",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        2,
+        3,
+        1
+      ],
+      "want": 6
+    },
+    {
+      "args": [
+        -2,
+        1,
+        2
+      ],
+      "want": 1
+    },
+    {
+      "args": [
+        0,
+        0,
+        3
+      ],
+      "want": 3
+    },
+    {
+      "args": [
+        5,
+        -3,
+        -1
+      ],
+      "want": 1
+    }
+  ]
+}

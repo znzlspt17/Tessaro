@@ -1,0 +1,40 @@
+[
+  {
+    "inputs": {
+      "xs": [
+        "z",
+        "z"
+      ],
+      "target": "z"
+    },
+    "want": 2
+  },
+  {
+    "inputs": {
+      "xs": [
+        "a",
+        "b"
+      ],
+      "target": "b"
+    },
+    "want": 1
+  },
+  {
+    "inputs": {
+      "xs": [
+        "a"
+      ],
+      "target": "a"
+    },
+    "want": 1
+  },
+  {
+    "inputs": {
+      "xs": [
+        "b"
+      ],
+      "target": "a"
+    },
+    "want": 0
+  }
+]

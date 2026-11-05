@@ -1,0 +1,12 @@
+{
+  "intent": "두 정수의 합을 반환한다.",
+  "name": "Add",
+  "params": [{"name": "a", "type": "int"}, {"name": "b", "type": "int"}],
+  "return_type": "int",
+  "constants": [0, 1],
+  "public_tests": [
+    {"args": [2, 3], "want": 5},
+    {"args": [-2, 1], "want": -1},
+    {"args": [0, 0], "want": 0}
+  ]
+}

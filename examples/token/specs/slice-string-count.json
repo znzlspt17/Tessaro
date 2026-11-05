@@ -1,0 +1,66 @@
+{
+  "intent": "문자열 배열에서 target과 같은 원소 수를 반환한다.",
+  "inputs": [
+    "xs",
+    "target"
+  ],
+  "allowed_types": [
+    "[]string",
+    "string",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "xs": [
+          "a",
+          "b",
+          "a"
+        ],
+        "target": "a"
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "xs": [],
+        "target": "a"
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "xs": [
+          "x"
+        ],
+        "target": "y"
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "xs": [
+          "",
+          ""
+        ],
+        "target": ""
+      },
+      "want": 2
+    }
+  ],
+  "type_hints": {
+    "xs": "[]string",
+    "target": "string"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

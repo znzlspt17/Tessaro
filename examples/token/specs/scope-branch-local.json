@@ -1,0 +1,65 @@
+{
+  "intent": "flag가 참이면 a+b, 거짓이면 a-b를 구한 후 2배를 반환한다.",
+  "inputs": [
+    "flag",
+    "a",
+    "b"
+  ],
+  "allowed_types": [
+    "bool",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      -2,
+      -1,
+      0,
+      1,
+      2
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "flag": false,
+        "a": 2,
+        "b": 3
+      },
+      "want": -2
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": -2,
+        "b": 1
+      },
+      "want": -2
+    },
+    {
+      "inputs": {
+        "flag": false,
+        "a": 0,
+        "b": 0
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "flag": true,
+        "a": 5,
+        "b": -3
+      },
+      "want": 4
+    }
+  ],
+  "type_hints": {
+    "flag": "bool",
+    "a": "int",
+    "b": "int"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}

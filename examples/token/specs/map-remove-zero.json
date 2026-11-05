@@ -1,0 +1,60 @@
+{
+  "intent": "정수 맵에서 값이 0인 항목을 제거하여 반환한다.",
+  "inputs": [
+    "m"
+  ],
+  "allowed_types": [
+    "map[string]int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "m": {
+          "a": 0,
+          "b": 2
+        }
+      },
+      "want": {
+        "b": 2
+      }
+    },
+    {
+      "inputs": {
+        "m": {}
+      },
+      "want": {}
+    },
+    {
+      "inputs": {
+        "m": {
+          "x": 1
+        }
+      },
+      "want": {
+        "x": 1
+      }
+    },
+    {
+      "inputs": {
+        "m": {
+          "x": 0
+        }
+      },
+      "want": {}
+    }
+  ],
+  "type_hints": {
+    "m": "map[string]int"
+  },
+  "output_type_hint": "map[string]int",
+  "validation_mode": "sampled_holdout"
+}

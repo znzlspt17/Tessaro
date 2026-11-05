@@ -1,0 +1,44 @@
+{
+  "intent": "정수 x가 0 이상인지 반환한다.",
+  "name": "Nonnegative",
+  "params": [
+    {
+      "name": "x",
+      "type": "int"
+    }
+  ],
+  "return_type": "bool",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        -3
+      ],
+      "want": false
+    },
+    {
+      "args": [
+        2
+      ],
+      "want": true
+    },
+    {
+      "args": [
+        0
+      ],
+      "want": true
+    },
+    {
+      "args": [
+        1
+      ],
+      "want": true
+    }
+  ]
+}

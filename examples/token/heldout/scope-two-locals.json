@@ -1,0 +1,66 @@
+[
+  {
+    "inputs": {
+      "flag": false,
+      "a": 11,
+      "b": 4
+    },
+    "want": 4
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "a": -7,
+      "b": -2
+    },
+    "want": -11
+  },
+  {
+    "inputs": {
+      "flag": false,
+      "a": 0,
+      "b": 9
+    },
+    "want": 9
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "a": 9,
+      "b": 0
+    },
+    "want": 9
+  },
+  {
+    "inputs": {
+      "flag": false,
+      "a": -8,
+      "b": 3
+    },
+    "want": 3
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "a": 1,
+      "b": 1
+    },
+    "want": 3
+  },
+  {
+    "inputs": {
+      "flag": false,
+      "a": -1,
+      "b": -1
+    },
+    "want": -1
+  },
+  {
+    "inputs": {
+      "flag": true,
+      "a": 6,
+      "b": -4
+    },
+    "want": -2
+  }
+]

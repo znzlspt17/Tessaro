@@ -1,0 +1,52 @@
+{
+  "intent": "0이 아닌 b로 a를 나눈 정수 몫을 반환한다. Go처럼 0 방향으로 버린다.",
+  "name": "Quotient",
+  "params": [
+    {
+      "name": "a",
+      "type": "int"
+    },
+    {
+      "name": "b",
+      "type": "int"
+    }
+  ],
+  "return_type": "int",
+  "constants": [
+    -2,
+    -1,
+    0,
+    1,
+    2
+  ],
+  "public_tests": [
+    {
+      "args": [
+        8,
+        3
+      ],
+      "want": 2
+    },
+    {
+      "args": [
+        -8,
+        3
+      ],
+      "want": -2
+    },
+    {
+      "args": [
+        8,
+        -3
+      ],
+      "want": -2
+    },
+    {
+      "args": [
+        -8,
+        -3
+      ],
+      "want": 2
+    }
+  ]
+}

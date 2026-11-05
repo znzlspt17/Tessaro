@@ -1,0 +1,63 @@
+{
+  "intent": "정수 맵에서 key에 대응하는 값을 반환한다. 없으면 0을 반환한다.",
+  "inputs": [
+    "m",
+    "key"
+  ],
+  "allowed_types": [
+    "map[string]int",
+    "string",
+    "int"
+  ],
+  "literals": {
+    "integers": [
+      0,
+      1
+    ],
+    "strings": [
+      ""
+    ]
+  },
+  "public_tests": [
+    {
+      "inputs": {
+        "m": {
+          "a": 2
+        },
+        "key": "a"
+      },
+      "want": 2
+    },
+    {
+      "inputs": {
+        "m": {
+          "a": 2
+        },
+        "key": "b"
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "m": {},
+        "key": "a"
+      },
+      "want": 0
+    },
+    {
+      "inputs": {
+        "m": {
+          "x": -1
+        },
+        "key": "x"
+      },
+      "want": -1
+    }
+  ],
+  "type_hints": {
+    "m": "map[string]int",
+    "key": "string"
+  },
+  "output_type_hint": "int",
+  "validation_mode": "sampled_holdout"
+}
