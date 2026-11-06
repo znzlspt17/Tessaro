@@ -28,6 +28,7 @@ type Request struct {
 	Heldout                                                     func() ([]spec.Test, error)
 	Trace                                                       func(synth.TraceEvent)
 	TraceCode                                                   bool
+	TraceDecisionContext                                        bool
 	InputPrice, OutputPrice                                     *float64
 }
 type Result struct {

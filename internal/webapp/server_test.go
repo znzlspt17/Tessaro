@@ -103,9 +103,16 @@ func TestFrontierResyncAndNonblockingSubscriber(t *testing.T) {
 	ready := make(chan struct{})
 	release := make(chan struct{})
 	s, err := New(Config{OutputDir: filepath.Join(dir, "out"), Problems: []Problem{{ID: "p", SpecPath: file}}, Models: []Model{{ID: "fake", NewRanker: func() rank.Ranker { return rank.Fake{} }}}, Run: func(ctx context.Context, _ tokenspec.Problem, _ rank.Ranker, q runner.Request) runner.Result {
+		if !q.TraceDecisionContext || q.TraceCode {
+			t.Errorf("web trace must opt in to decision context without per-event source")
+		}
 		q.TokenTrace(tokensynth.Event{ID: "1", ParentID: "root", Lexeme: "package", Reason: "forced", Step: 1})
 		q.TokenTrace(tokensynth.Event{ID: "2", ParentID: "1", Lexeme: "main", Reason: "available", Step: 2})
-		q.TokenTrace(tokensynth.Event{ID: "2", ParentID: "1", Lexeme: "main", Reason: "active", Step: 2, Rank: 1})
+		q.TokenTrace(tokensynth.Event{ID: "model", Reason: "decision_context", DecisionContext: map[string]any{"intent": "identity", "parents": map[string]any{"1": map[string]any{"prefix": "package"}}}, Step: 2})
+		score := 0.75
+		q.TokenTrace(tokensynth.Event{ID: "2", ParentID: "1", Lexeme: "main", Reason: "ranked", Step: 2, Rank: 1, Score: &score})
+		q.TokenTrace(tokensynth.Event{ID: "2", ParentID: "1", Lexeme: "main", Reason: "active", Step: 2})
+		q.TokenTrace(tokensynth.Event{ID: "bad", ParentID: "1", Lexeme: ";", Reason: "body_rejected", RejectionReason: "unused_expression", Step: 2})
 		q.TokenTrace(tokensynth.Event{ID: "frontier", Reason: "frontier", Step: 2, Frontier: []tokensynth.Path{{ID: "2", ParentID: "1", Rank: 1, TokenCount: 2}}, Calls: 1, Candidates: 2})
 		q.TokenTrace(tokensynth.Event{ID: "2", Reason: "phase_started", Phase: "compile", Status: "started"})
 		close(ready)
@@ -123,6 +130,22 @@ func TestFrontierResyncAndNonblockingSubscriber(t *testing.T) {
 	snap, err := s.snapshot(id)
 	if err != nil || len(snap.Frontier) != 1 || snap.Frontier[0].Code != "package main" || len(snap.Candidates) != 1 || snap.Candidates[0].Code != "package main" || snap.Phase != "compile" {
 		t.Fatalf("%+v %v", snap, err)
+	}
+	if snap.Candidates[0].Score == nil || *snap.Candidates[0].Score != 0.75 || snap.Candidates[0].Rank != 1 {
+		t.Fatalf("rank lost: %+v", snap.Candidates[0])
+	}
+	data, _ := json.Marshal(snap)
+	if !bytes.Contains(data, []byte(`"decision_context":{"intent":"identity"`)) {
+		t.Fatalf("missing model context: %s", data)
+	}
+	if !bytes.Contains(data, []byte(`"body_rejection_reason":"unused_expression"`)) {
+		t.Fatalf("missing body rejection: %s", data)
+	}
+	s.searchEvent(s.active, tokensynth.Event{ID: "3", ParentID: "2", Lexeme: ";", Reason: "available", Step: 3})
+	snap, err = s.snapshot(id)
+	data, _ = json.Marshal(snap)
+	if bytes.Contains(data, []byte(`"decision_context"`)) {
+		t.Fatalf("stale context survived next decision: %s", data)
 	}
 	s.mu.Lock()
 	r := s.active
@@ -339,12 +362,20 @@ func TestCatalogBudgetsAndFrontierClear(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// 2026-11-07: 임시 디렉터리 정리 전에 비동기 기록 저장이 끝나야 한다.
+	t.Cleanup(func() {
+		close(release)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := s.Close(ctx); err != nil {
+			t.Errorf("server shutdown: %v", err)
+		}
+	})
 	<-ready
 	snap, err := s.snapshot(id)
 	if err != nil || len(snap.Frontier) != 0 || snap.Current == nil || snap.Current.Budgets.MaxCalls != 7 || snap.Metrics["max_calls"] != float64(7) || snap.Current.Deadline == nil {
 		t.Fatalf("%+v %v", snap, err)
 	}
-	close(release)
 }
 func TestRejectForeignOriginAndWrongContentType(t *testing.T) {
 	s := &Server{}

@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"jevcancoding/internal/rank"
 	"jevcancoding/internal/tokenspec"
 	"jevcancoding/internal/tokensynth"
@@ -157,5 +158,37 @@ func TestTokenLengthBudgetClassified(t *testing.T) {
 	out := RunToken(context.Background(), p, rank.Fake{}, Request{MaxTokens: 1})
 	if out.Status != "budget_exhausted" || out.Calls != 0 {
 		t.Fatalf("%+v", out)
+	}
+}
+
+func TestTokenTraceCodeControlsDecisionContext(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, enabled := range []bool{false, true} {
+		t.Run(fmt.Sprint(enabled), func(t *testing.T) {
+			var contexts []map[string]any
+			RunToken(context.Background(), p, rank.Fake{}, Request{Strategy: "beam", MaxCalls: 1, TraceCode: enabled, TokenTrace: func(e tokensynth.Event) {
+				if e.Reason == "decision_context" && e.DecisionContext != nil {
+					contexts = append(contexts, e.DecisionContext)
+				}
+			}})
+			if (len(contexts) > 0) != enabled {
+				t.Fatalf("TraceCode %v: got %d contexts", enabled, len(contexts))
+			}
+		})
+	}
+	var sawContext bool
+	RunToken(context.Background(), p, rank.Fake{}, Request{Strategy: "beam", MaxCalls: 1, TraceDecisionContext: true, TokenTrace: func(e tokensynth.Event) {
+		if e.Code != "" {
+			t.Fatal("explicit decision context enabled per-event code tracing")
+		}
+		if e.Reason == "decision_context" && e.DecisionContext != nil {
+			sawContext = true
+		}
+	}})
+	if !sawContext {
+		t.Fatal("explicit decision context opt-in was ignored")
 	}
 }

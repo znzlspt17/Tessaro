@@ -1,4 +1,4 @@
-import { initialState, reduce, groupProblems, createRenderScheduler, updateCandidates, resultLabel, findRunningRun, isStorageError, recoverSnapshot, rejectionLabel } from './state.mjs';
+import { initialState, reduce, groupProblems, createRenderScheduler, updateCandidates, resultLabel, findRunningRun, isStorageError, recoverSnapshot, rejectionLabel, bodyRejectionLabel } from './state.mjs';
 const $ = id => document.getElementById(id);
 let state = initialState(), stream = null, activeRun = null, displayedRun = null, replayTimer = null, candidates = [], result = null, lastSeq = 0;
 let catalogProblems = [], currentProblemId = null, problemSelection = 0;
@@ -33,10 +33,19 @@ function renderHistory() {
 }
 function renderCandidates() {
   const rejected = $('declaration-rejection'); rejected.hidden = !state.view?.rejection; rejected.textContent = state.view?.rejection ? `최근 선언 차단: ${rejectionLabel(state.view.rejection)} 다른 경로의 탐색은 계속될 수 있습니다.` : ''; const shownCandidates = state.view?.candidates || []; const filter = $('parent-filter'), old = filter.value; filter.replaceChildren(new Option('전체', ''));
+  const bodyRejected = $('body-rejection'); bodyRejected.hidden = !state.view?.body_rejection; bodyRejected.textContent = state.view?.body_rejection ? `최근 본문 차단: ${bodyRejectionLabel(state.view.body_rejection)} 다른 경로의 탐색은 계속될 수 있습니다.` : '';
   [...new Set(shownCandidates.map(c => c.parent_id).filter(Boolean))].forEach(id => filter.add(new Option(id, id))); filter.value = selectedParent || old; if (!filter.value) selectedParent = '';
+  const context = state.view?.decision_context;
+  $('decision-intent').textContent = context?.intent || '기록 없음';
+  $('decision-tests').textContent = Array.isArray(context?.public_tests) ? JSON.stringify(context.public_tests, null, 2) : '기록 없음';
+  const parents = $('decision-parents'); parents.replaceChildren();
+  const parentEntries = Object.entries(context?.parents || {}).filter(([id]) => !filter.value || id === filter.value);
+  if (!parentEntries.length) parents.append(text('p', '부모 코드 기록 없음', 'hint'));
+  for (const [id, parent] of parentEntries) { const label = text('p', `부모 코드 · ${id}`, 'details-label'); const code = text('pre', typeof parent?.prefix === 'string' ? parent.prefix : '기록 없음', 'decision-parent-code'); parents.append(label, code); }
   const body = $('candidates'); body.replaceChildren(); const visible = shownCandidates.filter(c => !filter.value || c.parent_id === filter.value);
-  if (!visible.length) { const row = document.createElement('tr'), cell = text('td', '표시할 후보가 없습니다.', 'empty'); cell.colSpan = 4; row.append(cell); body.append(row); return; }
-  visible.forEach(c => { const row = document.createElement('tr'); [c.parent_id || '—', c.lexeme || '—', c.score ?? '—', ({available:'후보',ranked:'평가 완료',active:'유지',pruned:'탈락',forced:'강제',duplicate:'중복'})[c.reason] || c.reason || '—'].forEach(value => row.append(text('td', value))); body.append(row); });
+  if (!visible.length) { const row = document.createElement('tr'), cell = text('td', '표시할 후보가 없습니다.', 'empty'); cell.colSpan = 5; row.append(cell); body.append(row); return; }
+  // 2026-11-07: 코드와 토큰은 텍스트 노드로 표시해 모델 후보를 HTML로 해석하지 않는다.
+  visible.forEach(c => { const row = document.createElement('tr'); row.append(text('td', c.parent_id || '—'), text('td', c.lexeme || '—')); const cell = document.createElement('td'); const pre = document.createElement('pre'); pre.className = 'candidate-code'; const code = typeof c.code === 'string' ? c.code : null, lexeme = c.lexeme || ''; if (code !== null && lexeme && code.endsWith(lexeme)) { pre.append(document.createTextNode(code.slice(0, -lexeme.length)), text('mark', lexeme, 'candidate-token')); } else pre.textContent = code ?? '기록 없음'; cell.append(pre); row.append(cell, text('td', c.score ?? '—'), text('td', ({available:'후보',ranked:'평가 완료',active:'유지',pruned:'탈락',pruned_strict:'탈락',duplicate:'중복',public_passed:'검증 통과',public_failed:'검증 실패'})[c.reason] || '기록 없음')); body.append(row); });
 }
 function render() {
   renderPaths(); renderHistory(); renderCandidates(); if (result && !state.paused) $('phase').textContent = `문제 결과 · ${resultLabel(result.status)}`; $('step-label').textContent = state.view ? `단계 ${state.view.step ?? '—'}` : '단계 —';
@@ -116,10 +125,16 @@ function processUpdate(event, replay = false) {
   if (event.kind === 'problem_started') { const previousState = state; resetView(); currentProblemId = d.id || null; metricValues = {calls:0, candidates:0, ...(d.budgets || {})}; if (previousState.paused && !replay) state = {...state, paused:true, view:previousState.view, history:previousState.history}; if (!hidden && !replay) { $('current-problem').textContent = d.label || d.id || '문제 실행 중'; $('run-summary').textContent = '탐색 중'; } }
   if (event.kind === 'verification' && !hidden && !replay && !state.paused) $('phase').textContent = `${({typecheck:'타입 검사',compile:'컴파일',public:'공개 테스트',heldout:'비공개 테스트',model:'모델 평가'})[d.phase] || '검증'} · ${({started:'진행 중',passed:'통과',failed:'실패'})[d.status] || d.status || '대기'}`;
   if (event.kind === 'search') { if (!hidden && !replay && !state.paused && d.reason === 'ranked') $('phase').textContent = '모델 평가 · 완료'; if (d.calls != null) metricValues.calls = d.calls; if (d.candidates != null) metricValues.candidates = d.candidates;
-    if (d.reason !== 'declaration_rejected' && d.id && d.parent_id && d.lexeme && nodes.has(d.parent_id)) { const parent = nodes.get(d.parent_id).code; nodes.set(d.id, {code: parent ? `${parent} ${d.lexeme}` : d.lexeme, lexeme:d.lexeme, reason:d.reason, parent_id:d.parent_id}); }
-    if (['available','ranked','active','forced','pruned','duplicate'].includes(d.reason)) candidates = updateCandidates(candidates, d);
+    if (!['declaration_rejected','body_rejected'].includes(d.reason) && d.id && d.parent_id && d.lexeme && nodes.has(d.parent_id)) { const parent = nodes.get(d.parent_id).code; nodes.set(d.id, {code: parent ? `${parent} ${d.lexeme}` : d.lexeme, lexeme:d.lexeme, reason:d.reason, parent_id:d.parent_id}); }
+    // 2026-11-07: available로 제공된 후보만 모델 요청 표에 올리고 각 단계의 실제 문맥과 함께 보관한다.
+    if (d.reason === 'available' || (['ranked','active','pruned','pruned_strict','duplicate','public_passed','public_failed'].includes(d.reason) && candidates.some(c => c.id === d.id))) {
+      const node = nodes.get(d.id); candidates = updateCandidates(candidates, {...d, ...(node && typeof node.code === 'string' ? {code:node.code} : {})});
+      state = reduce(state, {type:'decision', step:d.step, candidates:[...candidates], decision_context:state.live?.step === d.step ? state.live?.decision_context : undefined});
+    }
+    if (d.reason === 'decision_context') state = reduce(state, {type:'decision', step:d.step, candidates:[...candidates], decision_context:d.decision_context});
     if (d.reason === 'declaration_rejected') state = reduce(state, {type:'declaration_rejected', step:d.step, rejection_reason:d.rejection_reason});
-    if (d.reason === 'frontier') { const paths = (d.frontier || []).map(p => ({...p, ...(nodes.get(p.id) || {})})); state = reduce(state, {type:'frontier', step:d.step, paths, candidates: [...candidates], rejection:state.live?.rejection}); }
+    if (d.reason === 'body_rejected') state = reduce(state, {type:'body_rejected', step:d.step, rejection_reason:d.rejection_reason});
+    if (d.reason === 'frontier') { const paths = (d.frontier || []).map(p => ({...p, ...(nodes.get(p.id) || {})})); const sameStep = state.live?.step === d.step; state = reduce(state, {type:'frontier', step:d.step, paths, candidates: sameStep ? state.live?.candidates || [] : [], decision_context:sameStep ? state.live?.decision_context : undefined, rejection:state.live?.rejection, body_rejection:state.live?.body_rejection}); }
   }
   if (event.kind === 'problem_finished') { result = d.result || null; if (!hidden && !replay && !state.paused) { $('phase').textContent = `문제 결과 · ${resultLabel(result?.status)}`; $('run-summary').textContent = `문제 결과: ${resultLabel(result?.status)}`; } }
   if (!replay && (event.kind === 'run_finished' || event.kind === 'storage_error')) { const failed = isStorageError(event.kind, d); $('connection').textContent = failed ? '저장 실패' : '묶음 실행 종료'; if (failed) notice('실험 결과를 저장하지 못했습니다.'); setRunLocked(false); if (stream) stream.close(); refreshRuns().catch(() => {}); }

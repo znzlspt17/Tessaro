@@ -52,7 +52,7 @@ func (h *HTTP) rank(ctx context.Context, intent string, cs []Candidate, usage **
 	}
 	instructions := "Choose the candidate that best satisfies the stated task."
 	if cs[0].TokenKind != "" {
-		instructions = "Select the next single Go lexical token for the referenced parent prefix. Options contain tokens only; find parent source and named-input task in state. Prefer a path that can complete the intended function."
+		instructions = "Select the next single Go lexical token that best progresses toward implementing the function described by state.intent and state.public_tests. Each option identifies its parent_id; read the current source in state.parents[parent_id].prefix and consider that source with the option's lexeme appended. Choose the option most likely to lead to a correct complete function."
 	}
 	payload := map[string]any{"model": h.Model, "state": intent, "questions": map[string]any{"pick": map[string]any{"type": "choice", "instructions": instructions, "criteria": criteria}}}
 	b, err := json.Marshal(payload)

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -12,11 +13,18 @@ func TestTokenRequestDoesNotSendExpandedCodeOptions(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body struct {
 			Questions map[string]struct {
-				Criteria map[string]json.RawMessage `json:"criteria"`
+				Instructions string                     `json:"instructions"`
+				Criteria     map[string]json.RawMessage `json:"criteria"`
 			} `json:"questions"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Error(err)
+		}
+		instructions := body.Questions["pick"].Instructions
+		for _, field := range []string{"intent", "public_tests", "parents", "parent_id", "prefix"} {
+			if !strings.Contains(instructions, field) {
+				t.Errorf("instruction missing %s", field)
+			}
 		}
 		for _, raw := range body.Questions["pick"].Criteria {
 			var option map[string]any

@@ -6,8 +6,20 @@ export function reduce(state, event) {
       const snapshot = { ...event };
       return { ...state, live: snapshot, view: state.paused ? state.view : snapshot, history: [...state.history, snapshot] };
     }
+    case 'decision': {
+      // 2026-11-07: 모델 대기 중 후보도 현재 단계에 기록하되 이전 단계의 문맥은 섞지 않는다.
+      const sameStep = state.live?.step === event.step;
+      const live = {...(sameStep ? state.live : {paths:state.live?.paths || []}), ...event};
+      const history = sameStep && state.history.length ? [...state.history.slice(0, -1), live] : [...state.history, live];
+      return {...state, live, history, view:state.paused ? state.view : live};
+    }
     case 'declaration_rejected': {
       const live = {...(state.live || {paths:[], step:event.step}), rejection:event.rejection_reason || 'unknown'};
+      const history = state.history.length ? [...state.history.slice(0, -1), live] : state.history;
+      return {...state, live, history, view:state.paused ? state.view : live};
+    }
+    case 'body_rejected': {
+      const live = {...(state.live || {paths:[], step:event.step}), body_rejection:event.rejection_reason || 'unknown'};
       const history = state.history.length ? [...state.history.slice(0, -1), live] : state.history;
       return {...state, live, history, view:state.paused ? state.view : live};
     }
@@ -71,7 +83,7 @@ export function recoverSnapshot(state, currentProblemId, snapshot, existingNodes
   }
   const base = sameProblem ? state : state.paused ? {...initialState(), paused:true, view:state.view} : initialState();
   const displayPaths = paths.map(path => ({...nodes.get(path.id), ...path}));
-  const nextState = reduce(base, {type:'frontier', step:snapshot.step ?? 0, paths:displayPaths, candidates:snapshot.candidates || [], rejection:sameProblem ? state.live?.rejection : undefined});
+  const nextState = reduce(base, {type:'frontier', step:snapshot.step ?? 0, paths:displayPaths, candidates:snapshot.candidates || [], decision_context:snapshot.decision_context, rejection:sameProblem ? state.live?.rejection : undefined, body_rejection:snapshot.body_rejection_reason ?? (sameProblem ? state.live?.body_rejection : undefined)});
   return {state:nextState, nodes, currentProblemId:problemId};
 }
 
@@ -79,4 +91,9 @@ export function recoverSnapshot(state, currentProblemId, snapshot, existingNodes
 export function rejectionLabel(reason) {
   const labels = {parameter_count:'매개변수 개수가 요구사항과 다릅니다.', parameter_name:'매개변수 이름이 요구사항과 다릅니다.', parameter_type:'매개변수 타입이 요구사항과 다릅니다.', variadic:'가변 매개변수가 허용되지 않습니다.', return_type:'반환 타입이 요구사항과 다릅니다.', missing_return_type:'필요한 반환 타입이 없습니다.', invalid_signature:'함수 선언 형식이 유효하지 않습니다.'};
   return Object.hasOwn(labels, reason) ? labels[reason] : '선언 형식이 요구사항과 맞지 않습니다.';
+}
+
+export function bodyRejectionLabel(reason) {
+  const labels = {unused_expression:'독립된 산술식은 문장으로 사용할 수 없습니다.', branch_outside_loop:'반복문 밖의 break 또는 continue입니다.', statement_limit:'문장 수 한도를 초과했습니다.', nesting_limit:'중첩 한도를 초과했습니다.'};
+  return Object.hasOwn(labels, reason) ? labels[reason] : '확정된 본문 오류가 발견되었습니다.';
 }

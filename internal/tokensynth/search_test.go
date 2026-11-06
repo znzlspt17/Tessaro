@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"jevcancoding/internal/rank"
 	"jevcancoding/internal/tokenlex"
+	"jevcancoding/internal/tokenverify"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -348,5 +350,143 @@ func TestRejectedEdgesConsumeCandidateBudget(t *testing.T) {
 	result, err := searchFrom(context.Background(), p, r, Options{Strategy: "beam", MaxCandidates: 1}, func(string) (bool, error) { return false, nil }, []*State{s})
 	if !errors.Is(err, ErrBudget) || result.Candidates != 1 || r.calls != 0 {
 		t.Fatalf("%+v err=%v calls=%d", result, err, r.calls)
+	}
+}
+
+func TestBodyErrorsRejectedBeforeModel(t *testing.T) {
+	p := subtractionSpec(t)
+	for _, tc := range []struct {
+		body, reason        string
+		statements, nesting int
+	}{
+		{"a + b ;", "unused_expression", 0, 0},
+		{"break ;", "branch_outside_loop", 0, 0},
+		{"continue ;", "branch_outside_loop", 0, 0},
+		{"a = b ; b = a ;", "statement_limit", 1, 0},
+		{"if a > b { if a > b {", "nesting_limit", 0, 1},
+	} {
+		t.Run(tc.reason+tc.body, func(t *testing.T) {
+			q := p
+			q.Budgets.MaxStatements = tc.statements
+			q.Budgets.MaxNesting = tc.nesting
+			s := advanceContract(t, q, strings.Fields("package main ; func f0 ( a int , b int ) int { "+tc.body))
+			var events []Event
+			_, err := searchFrom(context.Background(), q, failedRanker{}, Options{Strategy: "beam", Trace: func(e Event) { events = append(events, e) }}, func(string) (bool, error) { return false, nil }, []*State{s})
+			if !errors.Is(err, ErrNoSolution) {
+				t.Fatalf("expected no solution, got %v", err)
+			}
+			for _, e := range events {
+				if e.Reason == "body_rejected" && string(e.RejectionReason) == tc.reason {
+					return
+				}
+			}
+			t.Fatalf("no body rejection %s in %+v", tc.reason, events)
+		})
+	}
+}
+
+func TestDecisionContextMatchesRankInput(t *testing.T) {
+	p := subtractionSpec(t)
+	var got string
+	r := captureRanker{fn: func(state string) { got = state }}
+	var observed map[string]any
+	_, _ = Search(context.Background(), p, r, Options{Strategy: "beam", Trace: func(e Event) {
+		b, _ := json.Marshal(e)
+		var m map[string]any
+		_ = json.Unmarshal(b, &m)
+		if m["reason"] == "decision_context" {
+			observed, _ = m["decision_context"].(map[string]any)
+		}
+	}}, func(string) (bool, error) { return false, nil })
+	var want map[string]any
+	_ = json.Unmarshal([]byte(got), &want)
+	if observed == nil || !reflect.DeepEqual(observed, want) {
+		t.Fatalf("decision context does not match rank input: got=%v want=%v", observed, want)
+	}
+}
+
+type captureRanker struct{ fn func(string) }
+
+func (r captureRanker) Rank(_ context.Context, s string, _ []rank.Candidate) ([]rank.Score, error) {
+	r.fn(s)
+	return nil, errors.New("stop after capture")
+}
+
+func TestBodyStartAndExpressionCandidates(t *testing.T) {
+	p := subtractionSpec(t)
+	for _, tc := range []struct {
+		prefix          string
+		present, absent []string
+	}{
+		{"package main ; func f0 ( a int , b int ) int {", []string{"for", "var", "return", "v0"}, nil},
+		{"package main ; func f0 ( a int , b int ) int { return a +", []string{"a", "b"}, []string{"for"}},
+	} {
+		s := advanceContract(t, p, strings.Fields(tc.prefix))
+		got := map[string]bool{}
+		for _, c := range mustNext(t, p, s) {
+			got[c.Lexeme] = true
+		}
+		for _, v := range tc.present {
+			if !got[v] {
+				t.Errorf("%s missing after %s", v, tc.prefix)
+			}
+		}
+		for _, v := range tc.absent {
+			if got[v] {
+				t.Errorf("%s offered after %s", v, tc.prefix)
+			}
+		}
+	}
+}
+
+func TestBodyGateFiltersBeforeRanking(t *testing.T) {
+	p := subtractionSpec(t)
+	s := advanceContract(t, p, strings.Fields("package main ; func f0 ( a int , b int ) int { a + b"))
+	var offered []rank.Candidate
+	var rejected bool
+	r := candidateRecorder{fn: func(cs []rank.Candidate) { offered = append([]rank.Candidate(nil), cs...) }}
+	_, _ = searchFrom(context.Background(), p, r, Options{Strategy: "beam", Trace: func(e Event) {
+		if e.Reason == "body_rejected" && e.Lexeme == ";" && e.RejectionReason == "unused_expression" {
+			rejected = true
+		}
+	}}, func(string) (bool, error) { return false, nil }, []*State{s})
+	for _, c := range offered {
+		if c.Lexeme == ";" {
+			t.Fatal("invalid standalone expression was offered to ranker")
+		}
+	}
+	if !rejected {
+		t.Fatal("no body_rejected event for semicolon")
+	}
+}
+
+type candidateRecorder struct{ fn func([]rank.Candidate) }
+
+func (r candidateRecorder) Rank(_ context.Context, _ string, cs []rank.Candidate) ([]rank.Score, error) {
+	r.fn(cs)
+	return nil, errors.New("stop after capture")
+}
+
+func TestBodyGatePreservesUnfinishedAndLoopPrefixes(t *testing.T) {
+	p := subtractionSpec(t)
+	for _, body := range []string{
+		"v0 := a ;", "return a +", "if a > b {", "if a > b { return a ; }",
+		"for a > b { break ;", "for a > b { continue ;", "for a = 0 ; a < b ; a ++ {",
+		"a = a + b + a + b + a + b ;",
+	} {
+		t.Run(body, func(t *testing.T) {
+			tokens := strings.Fields("package main ; func f0 ( a int , b int ) int { " + body)
+			if reason := tokenverify.CheckBodyPrefix(p, tokens); reason != "" {
+				t.Fatalf("rejected valid prefix: %s", reason)
+			}
+		})
+	}
+}
+
+func TestBodyGateDoesNotCloseCompositeLiteral(t *testing.T) {
+	p := subtractionSpec(t)
+	tokens := strings.Fields("package main ; func f0 ( a int , b int ) int { a + [ ] int {")
+	if reason := tokenverify.CheckBodyPrefix(p, tokens); reason != "" {
+		t.Fatalf("unfinished composite literal must remain pending: %s", reason)
 	}
 }

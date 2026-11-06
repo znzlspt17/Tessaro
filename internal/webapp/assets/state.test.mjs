@@ -100,3 +100,40 @@ test('선언 차단은 frontier를 바꾸지 않고 일시정지 및 기록 선�
   assert.equal(state.view.rejection, 'parameter_count');
   assert.equal(rejectionLabel('<unsafe>'), '선언 형식이 요구사항과 맞지 않습니다.');
 });
+
+test('모델 요청 후보와 판단 문맥은 대기 중에도 표시되고 단계별로 보존된다', () => {
+  let state = reduce(initialState(), {type:'frontier', step:1, paths:[{id:'p',code:'return'}]});
+  state = reduce(state, {type:'decision', step:2, candidates:[{id:'a',parent_id:'p',lexeme:'n',code:'return n',reason:'available'}], decision_context:{intent:'값 반환',parents:{p:{prefix:'return'}}}});
+  assert.equal(state.view.candidates[0].code, 'return n');
+  assert.equal(state.view.decision_context.intent, '값 반환');
+  state = reduce(state, {type:'pause'});
+  state = reduce(state, {type:'decision', step:2, candidates:[{id:'a',parent_id:'p',lexeme:'n',code:'return n',reason:'ranked',score:0.7}], decision_context:state.live.decision_context});
+  assert.equal(state.view.candidates[0].reason, 'available');
+  assert.equal(state.live.candidates[0].score, 0.7);
+  state = reduce(state, {type:'resume'});
+  state = reduce(state, {type:'decision', step:3, candidates:[{id:'b',lexeme:';'}], decision_context:{intent:'다음'}});
+  state = reduce(state, {type:'select', index:1});
+  assert.equal(state.view.candidates[0].score, 0.7);
+  assert.equal(state.view.decision_context.intent, '값 반환');
+});
+
+test('재접속 snapshot은 판단 문맥과 후보 코드를 복구하고 이전 기록의 누락은 빈 상태로 남는다', async () => {
+  const { recoverSnapshot } = await import('./state.mjs');
+  const context = {intent:'합',parents:{p:{prefix:'return'}}};
+  const result = recoverSnapshot(initialState(), null, {current:{id:'p1'}, step:2, frontier:[], decision_context:context, candidates:[{id:'c',parent_id:'p',lexeme:'n',code:'return n'}]});
+  assert.deepEqual(result.state.view.decision_context, context);
+  assert.equal(result.state.view.candidates[0].code, 'return n');
+  const rejected = recoverSnapshot(initialState(), null, {current:{id:'p1'}, step:3, frontier:[], body_rejection_reason:'unused_expression'});
+  assert.equal(rejected.state.view.body_rejection, 'unused_expression');
+  const legacy = recoverSnapshot(initialState(), null, {current:{id:'old'},step:1,frontier:[]});
+  assert.equal(legacy.state.view.decision_context, undefined);
+});
+
+test('본문 차단은 선언 차단과 분리하고 알 수 없는 이유는 안전하게 표시한다', async () => {
+  const { bodyRejectionLabel } = await import('./state.mjs');
+  let state = reduce(initialState(), {type:'frontier', step:1, paths:[{id:'p'}]});
+  state = reduce(state, {type:'body_rejected', step:1, rejection_reason:'unused_expression'});
+  assert.equal(state.view.body_rejection, 'unused_expression');
+  assert.equal(state.view.rejection, undefined);
+  assert.notEqual(bodyRejectionLabel('unused_expression'), bodyRejectionLabel('<unsafe>'));
+});

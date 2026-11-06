@@ -111,6 +111,8 @@ type Snapshot struct {
 	Current               *PublicProblem  `json:"current"`
 	Frontier              []FrontierItem  `json:"frontier"`
 	Candidates            []CandidateItem `json:"candidates"`
+	DecisionContext       map[string]any  `json:"decision_context,omitempty"`
+	BodyRejectionReason   string          `json:"body_rejection_reason,omitempty"`
 	Step                  int             `json:"step"`
 	Phase                 string          `json:"phase,omitempty"`
 	PhaseStatus           string          `json:"phase_status,omitempty"`
@@ -290,6 +292,8 @@ func (s *Server) execute(ctx context.Context, r *runState, model Model, ids []st
 		r.snapshot.Current = &current
 		r.snapshot.Frontier = []FrontierItem{}
 		r.snapshot.Candidates = []CandidateItem{}
+		r.snapshot.DecisionContext = nil
+		r.snapshot.BodyRejectionReason = ""
 		r.snapshot.Step = 0
 		r.snapshot.Phase = ""
 		r.snapshot.PhaseStatus = ""
@@ -304,7 +308,7 @@ func (s *Server) execute(ctx context.Context, r *runState, model Model, ids []st
 		r.nodes = map[string]node{}
 		s.emitLocked(r, "problem_started", current)
 		s.mu.Unlock()
-		q := runner.Request{Strategy: "beam", TokenTrace: func(event tokensynth.Event) { s.searchEvent(r, event) }}
+		q := runner.Request{Strategy: "beam", TraceDecisionContext: true, TokenTrace: func(event tokensynth.Event) { s.searchEvent(r, event) }}
 		if problem.config.HeldoutPath != "" {
 			q.TokenHeldout = func() ([]tokenspec.Test, error) {
 				f, e := os.Open(problem.config.HeldoutPath)
@@ -360,19 +364,33 @@ func (s *Server) searchEvent(r *runState, e tokensynth.Event) {
 		r.snapshot.Metrics["calls"] = e.Calls
 		r.snapshot.Metrics["candidates"] = e.Candidates
 	}
+	if e.Reason == "decision_context" {
+		r.snapshot.DecisionContext = e.DecisionContext
+	}
+	if e.Reason == "body_rejected" {
+		switch e.RejectionReason {
+		case "unused_expression", "branch_outside_loop", "statement_limit", "nesting_limit":
+			r.snapshot.BodyRejectionReason = string(e.RejectionReason)
+		}
+	}
 	if e.Reason == "available" {
 		if e.Step != r.candidateStep {
 			r.snapshot.Candidates = []CandidateItem{}
+			r.snapshot.DecisionContext = nil
 			r.candidateStep = e.Step
 		}
 		r.snapshot.Candidates = append(r.snapshot.Candidates, CandidateItem{ID: e.ID, ParentID: e.ParentID, Lexeme: e.Lexeme, TokenKind: e.TokenKind, Reason: e.Reason, Code: assemble(r.nodes, e.ID)})
 	}
-	if e.Reason == "ranked" || e.Reason == "active" || e.Reason == "pruned" || e.Reason == "public_passed" || e.Reason == "public_failed" {
+	if e.Reason == "ranked" || e.Reason == "active" || e.Reason == "pruned" || e.Reason == "pruned_strict" || e.Reason == "duplicate" || e.Reason == "public_passed" || e.Reason == "public_failed" {
 		for i := range r.snapshot.Candidates {
 			c := &r.snapshot.Candidates[i]
 			if c.ID == e.ID {
-				c.Rank = e.Rank
-				c.Score = e.Score
+				if e.Rank > 0 {
+					c.Rank = e.Rank
+				}
+				if e.Score != nil {
+					c.Score = e.Score
+				}
 				c.Reason = e.Reason
 				break
 			}

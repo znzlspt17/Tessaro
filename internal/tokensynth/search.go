@@ -27,6 +27,7 @@ type Event struct {
 	Rank            int                           `json:"rank,omitempty"`
 	Score           *float64                      `json:"score,omitempty"`
 	Code            string                        `json:"code,omitempty"`
+	DecisionContext map[string]any                `json:"decision_context,omitempty"`
 }
 
 type Path struct {
@@ -97,6 +98,11 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 			o.Trace(Event{ID: id, ParentID: parent, Lexeme: c.Lexeme, TokenKind: c.Kind, Rule: c.Rule, Reason: "declaration_rejected", RejectionReason: reason, Step: step, Calls: out.Calls, Candidates: out.Candidates})
 		}
 	}
+	rejectBody := func(id, parent string, c Choice, reason tokenverify.DeclarationReason) {
+		if o.Trace != nil {
+			o.Trace(Event{ID: id, ParentID: parent, Lexeme: c.Lexeme, TokenKind: c.Kind, Rule: c.Rule, Reason: "body_rejected", RejectionReason: reason, Step: step, Calls: out.Calls, Candidates: out.Candidates})
+		}
+	}
 	emit := func(id, parent, reason string, c Choice, s *State, score *float64, rankIndex int) {
 		if o.Trace == nil {
 			return
@@ -149,6 +155,10 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 		}
 		if declaration.Status == tokenverify.DeclarationRejected {
 			reject(state.ID, state.ParentID, Choice{}, declaration.Reason)
+			continue
+		}
+		if reason := tokenverify.CheckBodyPrefix(p, state.Tokens); reason != "" {
+			rejectBody(state.ID, state.ParentID, Choice{}, reason)
 			continue
 		}
 		validInitial = append(validInitial, state)
@@ -238,6 +248,17 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 						reject(id, state.ID, choice, checked.Reason)
 						continue
 					}
+					if choice.Lexeme == ";" || choice.Lexeme == "}" || choice.Lexeme == "{" {
+						tokens := append(append([]string(nil), state.Tokens...), choice.Lexeme)
+						if reason := tokenverify.CheckBodyPrefix(p, tokens); reason != "" {
+							if out.Candidates >= o.MaxCandidates {
+								return out, ErrBudget
+							}
+							out.Candidates++
+							rejectBody(fmt.Sprintf("%08d", out.Candidates), state.ID, choice, reason)
+							continue
+						}
+					}
 					choices = append(choices, checkedChoice{choice, checked})
 				}
 				if len(choices) == 0 {
@@ -306,7 +327,11 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 		if out.Calls >= o.MaxCalls {
 			return out, ErrBudget
 		}
-		stateData, _ := json.Marshal(map[string]any{"intent": p.Intent, "inputs": p.Inputs, "allowed_types": p.AllowedTypes, "literals": p.Literals, "type_hints": p.TypeHints, "output_type_hint": p.OutputTypeHint, "public_tests": p.PublicTests, "parents": parents})
+		contextData := map[string]any{"intent": p.Intent, "inputs": p.Inputs, "allowed_types": p.AllowedTypes, "literals": p.Literals, "type_hints": p.TypeHints, "output_type_hint": p.OutputTypeHint, "public_tests": p.PublicTests, "parents": parents}
+		stateData, _ := json.Marshal(contextData)
+		if o.Trace != nil {
+			o.Trace(Event{ID: "model", Reason: "decision_context", DecisionContext: contextData, Step: step, Calls: out.Calls, Candidates: out.Candidates})
+		}
 		out.Calls++
 		emit("model", "", "model_started", Choice{}, nil, nil, 0)
 		scores, e := r.Rank(ctx, string(stateData), candidates)

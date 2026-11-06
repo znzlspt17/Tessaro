@@ -129,6 +129,9 @@ func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request
 	verificationID := "verification"
 	if q.TokenTrace != nil {
 		trace = func(e tokensynth.Event) {
+			if e.Reason == "decision_context" && !q.TraceCode && !q.TraceDecisionContext {
+				return
+			}
 			if e.Reason == "validation_started" {
 				verificationID = e.ID
 			}

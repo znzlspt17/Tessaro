@@ -10,3 +10,11 @@
 @media(max-width:1000px){.sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.sidebar{grid-template-columns:minmax(0,1fr)}}
 @media (min-width:601px) and (max-width:1000px){.paths{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* 2026-11-07: 후보마다 긴 코드가 들어와도 표 안에서 읽을 수 있게 별도 스크롤을 둔다. */
+.decision-context{margin:1rem 0;border:1px solid var(--line);border-radius:8px;padding:.75rem}
+.decision-context summary{cursor:pointer;font-size:.8rem;font-weight:700}
+.decision-context .hint{margin:.2rem 0}
+.decision-parent-code,.candidate-code{font:.75rem/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.decision-parent-code{padding:.7rem;background:var(--bg);max-height:12rem;overflow:auto}
+.candidate-code{min-width:15rem;max-width:36rem;max-height:9rem;overflow:auto;padding:.6rem;background:var(--bg)}
+.candidate-token{background:#b9eadb;color:#06483d;font-weight:800;padding:0 .1rem}

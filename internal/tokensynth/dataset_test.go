@@ -6,6 +6,7 @@ import (
 	"go/scanner"
 	"go/token"
 	"jevcancoding/internal/tokenspec"
+	"jevcancoding/internal/tokenverify"
 	"os"
 	"path/filepath"
 	"strings"
@@ -95,6 +96,9 @@ func TestDatasetReferenceFrontiers(t *testing.T) {
 				state, e = state.Advance(*chosen, "replay")
 				if e != nil {
 					t.Fatal(e)
+				}
+				if reason := tokenverify.CheckBodyPrefix(p, state.Tokens); reason != "" {
+					t.Fatalf("reference body rejected: %s after %s", reason, state.Source())
 				}
 			}
 			if !Complete(state) {
