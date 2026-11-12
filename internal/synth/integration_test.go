@@ -2,10 +2,10 @@ package synth_test
 
 import (
 	"context"
-	"jevcancoding/internal/rank"
-	"jevcancoding/internal/spec"
-	"jevcancoding/internal/synth"
-	"jevcancoding/internal/verify"
+	"jevcancode/internal/rank"
+	"jevcancode/internal/spec"
+	"jevcancode/internal/synth"
+	"jevcancode/internal/verify"
 	"strings"
 	"testing"
 	"time"

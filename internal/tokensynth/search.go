@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"jevcancoding/internal/rank"
-	"jevcancoding/internal/tokenspec"
-	"jevcancoding/internal/tokenverify"
+	"jevcancode/internal/rank"
+	"jevcancode/internal/tokenspec"
+	"jevcancode/internal/tokenverify"
 )
 
 type Event struct {

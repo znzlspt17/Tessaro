@@ -3,8 +3,8 @@ package synth
 import (
 	"context"
 	"errors"
-	"jevcancoding/internal/rank"
-	"jevcancoding/internal/spec"
+	"jevcancode/internal/rank"
+	"jevcancode/internal/spec"
 	"strings"
 	"testing"
 )

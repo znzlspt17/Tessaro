@@ -4,7 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"jevcancoding/internal/tokenspec"
+	"jevcancode/internal/tokenspec"
 	"strings"
 )
 

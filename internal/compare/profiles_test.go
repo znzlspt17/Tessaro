@@ -1,7 +1,7 @@
 package compare
 
 import (
-	"jevcancoding/internal/rank"
+	"jevcancode/internal/rank"
 	"testing"
 )
 

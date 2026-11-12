@@ -1,7 +1,7 @@
 package verify
 
 import (
-	"jevcancoding/internal/spec"
+	"jevcancode/internal/spec"
 	"testing"
 )
 

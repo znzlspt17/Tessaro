@@ -2,8 +2,8 @@ package runner
 
 import (
 	"context"
-	"jevcancoding/internal/rank"
-	"jevcancoding/internal/spec"
+	"jevcancode/internal/rank"
+	"jevcancode/internal/spec"
 	"testing"
 )
 

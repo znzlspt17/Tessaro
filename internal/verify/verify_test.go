@@ -2,7 +2,7 @@ package verify
 
 import (
 	"context"
-	"jevcancoding/internal/spec"
+	"jevcancode/internal/spec"
 	"testing"
 	"time"
 )

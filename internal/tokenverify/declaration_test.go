@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"go/scanner"
 	"go/token"
-	"jevcancoding/internal/tokenspec"
+	"jevcancode/internal/tokenspec"
 	"os"
 	"path/filepath"
 	"strings"

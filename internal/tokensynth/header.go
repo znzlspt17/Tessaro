@@ -3,8 +3,8 @@ package tokensynth
 import (
 	"fmt"
 	"go/token"
-	"jevcancoding/internal/tokenspec"
-	"jevcancoding/internal/tokenverify"
+	"jevcancode/internal/tokenspec"
+	"jevcancode/internal/tokenverify"
 )
 
 type headerPhase uint8

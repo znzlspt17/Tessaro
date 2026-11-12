@@ -1,7 +1,7 @@
 package main
 
 import (
-	"jevcancoding/internal/tokenspec"
+	"jevcancode/internal/tokenspec"
 	"time"
 )
 

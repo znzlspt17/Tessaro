@@ -3,8 +3,8 @@ package verify
 import (
 	"context"
 	"encoding/json"
-	"jevcancoding/internal/benchmark"
-	"jevcancoding/internal/spec"
+	"jevcancode/internal/benchmark"
+	"jevcancode/internal/spec"
 	"os"
 	"path/filepath"
 	"testing"

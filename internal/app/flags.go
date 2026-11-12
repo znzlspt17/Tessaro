@@ -3,7 +3,7 @@ package app
 import (
 	"flag"
 	"fmt"
-	"jevcancoding/internal/rank"
+	"jevcancode/internal/rank"
 	"time"
 )
 

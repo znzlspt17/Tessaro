@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"jevcancoding/internal/app"
-	"jevcancoding/internal/benchmark"
+	"jevcancode/internal/app"
+	"jevcancode/internal/benchmark"
 	"os"
 	"time"
 )

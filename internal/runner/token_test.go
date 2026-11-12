@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"jevcancoding/internal/rank"
-	"jevcancoding/internal/tokenspec"
-	"jevcancoding/internal/tokensynth"
+	"jevcancode/internal/rank"
+	"jevcancode/internal/tokenspec"
+	"jevcancode/internal/tokensynth"
 	"strings"
 	"testing"
 )

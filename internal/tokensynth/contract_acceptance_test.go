@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"jevcancoding/internal/tokenspec"
-	"jevcancoding/internal/tokensynth"
-	"jevcancoding/internal/tokenverify"
+	"jevcancode/internal/tokenspec"
+	"jevcancode/internal/tokensynth"
+	"jevcancode/internal/tokenverify"
 )
 
 func acceptanceSpec(names, types []string, output string) tokenspec.Problem {

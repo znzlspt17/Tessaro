@@ -3,7 +3,7 @@ package tokenverify
 import (
 	"context"
 	"encoding/json"
-	"jevcancoding/internal/tokenspec"
+	"jevcancode/internal/tokenspec"
 	"os"
 	"path/filepath"
 	"strings"

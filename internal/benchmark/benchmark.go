@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"jevcancoding/internal/jsoninput"
-	"jevcancoding/internal/rank"
+	"jevcancode/internal/jsoninput"
+	"jevcancode/internal/rank"
 	"sort"
 	"time"
 )

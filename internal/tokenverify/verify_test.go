@@ -3,8 +3,8 @@ package tokenverify
 import (
 	"context"
 	"errors"
-	"jevcancoding/internal/tokenspec"
-	"jevcancoding/internal/verify"
+	"jevcancode/internal/tokenspec"
+	"jevcancode/internal/verify"
 	"strings"
 	"testing"
 )

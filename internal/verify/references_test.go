@@ -3,7 +3,7 @@ package verify
 import (
 	"context"
 	"encoding/json"
-	"jevcancoding/internal/spec"
+	"jevcancode/internal/spec"
 	"os"
 	"path/filepath"
 	"testing"

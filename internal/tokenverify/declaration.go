@@ -6,7 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
-	"jevcancoding/internal/tokenspec"
+	"jevcancode/internal/tokenspec"
 	"strings"
 )
 

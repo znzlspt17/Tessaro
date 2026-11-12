@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go/token"
 	"io"
-	"jevcancoding/internal/jsoninput"
+	"jevcancode/internal/jsoninput"
 	"math"
 	"strconv"
 )

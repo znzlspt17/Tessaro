@@ -2,8 +2,8 @@ package runner
 
 import (
 	"context"
-	"jevcancoding/internal/tokenspec"
-	"jevcancoding/internal/tokensynth"
+	"jevcancode/internal/tokenspec"
+	"jevcancode/internal/tokensynth"
 	"strings"
 	"testing"
 )
