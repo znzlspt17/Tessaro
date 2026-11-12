@@ -8,6 +8,15 @@
 coverage.out
 coverage.html
 *.prof
+/cmd/desktop/jev_desktop.syso
+/internal/desktop/jev_desktop_test.syso
+
+# 로컬 opt-in 메모리 측정 도구
+/internal/desktop/trace_index_probe_windows_test.go
+
+# 원본에서 재생성하는 연구 데이터
+/examples/research/dev/
+/examples/research/eval/
 
 # Python 로컬 실행 환경과 캐시
 .venv/
@@ -35,6 +44,8 @@ htmlcov/
 .vscode/
 .idea/
 .codex/
+/.superpowers/
+/docs/superpowers/
 
 # 비밀 설정과 인증 자료
 .env

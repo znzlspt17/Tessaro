@@ -6,12 +6,12 @@ RX 9070 XT에서 Decider-4B를 Windows 네이티브로 실행하는 경로입니
 .\runtime\setup.ps1
 .venv-rocm72\Scripts\python.exe -I runtime\download_model.py
 .venv-rocm72\Scripts\python.exe -I runtime\gpu_probe.py --model-dir runtime\models\decider-4b --repeats 3
-.venv-rocm72\Scripts\python.exe runtime\local_server.py --model-dir runtime\models\decider-4b --port 8000
+# 준비가 끝나면 JevCanCode.exe에서 Decider를 선택합니다.
 ```
 
 모델 다운로드는 약 8.4GB이며 공개 revision `585473dec4fa93f0325c2bf02dda7273b61f44c1`을 사용합니다. `token=False`로 인증 없이 받으며, 추론 시에는 offline 설정을 적용합니다. 모델 파일과 Python 환경은 Git 대상에서 제외됩니다. 이미 준비된 환경에서는 설치·다운로드를 반복할 필요가 없습니다.
 
-서버는 `127.0.0.1:8000`에만 바인딩합니다. `GET /health`, `POST /v1/systemone`을 제공하며 한 요청의 Choice 질문 하나, 2~255개 후보만 지원합니다. 요청은 1MiB 이하이고 순차 처리합니다. Go CLI의 `local` ranker를 이 주소로 연결합니다. 서버 종료는 실행한 터미널에서 Ctrl+C로 합니다.
+프로그램이 `local_worker.py`를 숨김 Python 자식 프로세스로 실행합니다. 별도 서버·포트·시작 명령은 없습니다. 버전과 요청 ID가 있는 JSON Lines로 Choice 질문 하나와 2~255개 후보를 전달하며, 프레임은 1MiB 이하이고 순차 처리합니다. 모델은 준비 후 재사용하고, 취소·시간 초과 시 워커를 종료해 다음 실행에서 다시 준비합니다. stdout은 프로토콜 전용이며 원시 진단을 결과에 기록하지 않습니다.
 
 ## 실행 경로
 
@@ -26,7 +26,7 @@ AMD 공식 지원 조합은 [Windows matrix](https://rocm.docs.amd.com/projects/
 
 ## 2026-11-05 실제 확인
 
-아래 수치는 지역 변수·비교 실행기 확장 이전 구현에서 측정한 기록입니다. 확장된 문법의 후보 수·시간과 직접 비교하지 마세요. 이번 확장 개발에서는 실제 모델 추론을 다시 실행하지 않습니다.
+아래 수치는 지역 변수·비교 실행기 확장 이전 구현에서 측정한 기록입니다. 확장된 문법의 후보 수·시간과 직접 비교하지 마세요. 이 과거 측정은 현재 네이티브 워커의 검증 결과와 구분합니다.
 
 Windows 11 10.0.26300, RX 9070 XT, WMI 드라이버 `32.0.32015.2008`, Python 3.12.12에서 다음을 확인했습니다.
 
