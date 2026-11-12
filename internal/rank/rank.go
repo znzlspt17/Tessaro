@@ -24,6 +24,22 @@ type Ranker interface {
 	Rank(context.Context, string, []Candidate) ([]Score, error)
 }
 
+// CategoricalRanker는 점수가 정규화된 범주 분포라는 명시적 계약이다.
+type CategoricalRanker interface{ NormalizedCategorical() bool }
+
+// 2026-11-12: 사용자에게 응답 본문이나 네트워크 내부 오류를 노출하지 않는 식별자다.
+type SafeError struct {
+	Code, Message string
+	Cause         error
+}
+
+func (e *SafeError) Error() string     { return e.Message }
+func (e *SafeError) Unwrap() error     { return e.Cause }
+func (e *SafeError) ErrorCode() string { return e.Code }
+
+// HTTPRequestCounter는 실제 HTTP 전송 횟수를 관측할 수 있는 공급자에만 구현한다.
+type HTTPRequestCounter interface{ HTTPRequests() int64 }
+
 func Validate(cs []Candidate, ss []Score) error {
 	if len(cs) != len(ss) {
 		return fmt.Errorf("score count mismatch")
@@ -96,3 +112,27 @@ type Usage struct {
 type UsageRanker interface {
 	RankWithUsage(context.Context, string, []Candidate) ([]Score, *Usage, error)
 }
+
+// Decision은 각 호출에서 검증된 모델의 실제 선택과 점수를 함께 전달한다.
+type Decision struct {
+	Scores   []Score
+	ChosenID string
+	Usage    *Usage
+}
+
+type DecisionRanker interface {
+	RankDecision(context.Context, string, []Candidate) (Decision, error)
+}
+
+type DecisionRequest struct {
+	State      string
+	Candidates []Candidate
+}
+
+// BatchDecisionRanker는 상호 독립적인 질문의 결정을 한 호출로 반환한다.
+type BatchDecisionRanker interface {
+	RankDecisions(context.Context, []DecisionRequest) ([]Decision, *Usage, error)
+}
+
+// BatchCapability lets wrappers preserve whether transport batching is available.
+type BatchCapability interface{ SupportsDecisionBatch() bool }

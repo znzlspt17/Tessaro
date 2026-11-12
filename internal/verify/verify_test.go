@@ -53,3 +53,13 @@ func TestLocalAssignmentAndBranchContinuation(t *testing.T) {
 		t.Fatalf("%v %v", ok, err)
 	}
 }
+
+func TestValuesOnlyPolicyEnforcedForLegacySource(t *testing.T) {
+	p := spec.Problem{Intent: "identity", Name: "F", Params: []spec.Param{{Name: "x", Type: "int"}}, ReturnType: "int", ReturnPolicy: spec.ReturnPolicyValuesOnly, PublicTests: []spec.Test{{Args: []any{1}, Want: 1}}}
+	if _, err := Source(p, "return x + 1"); err == nil {
+		t.Fatal("computed return accepted")
+	}
+	if _, err := Source(p, "v0 := x + 1; return v0"); err != nil {
+		t.Fatal(err)
+	}
+}

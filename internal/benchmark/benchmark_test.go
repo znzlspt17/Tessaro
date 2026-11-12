@@ -10,6 +10,26 @@ import (
 
 type broken struct{}
 
+type cancelRanker struct {
+	cancel context.CancelFunc
+	calls  int
+}
+
+func (r *cancelRanker) Rank(context.Context, string, []rank.Candidate) ([]rank.Score, error) {
+	r.calls++
+	r.cancel()
+	return nil, errors.New("unsafe diagnostic")
+}
+func TestCancelledRunDoesNotStartFurtherRequestsOrSaveDiagnostics(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	r := &cancelRanker{cancel: cancel}
+	m := Manifest{Problems: []Problem{{ID: "one"}, {ID: "two"}}}
+	out := Run(ctx, m, r)
+	if r.calls != 1 || len(out.Items) != 2 || out.Items[0].Error != "model_error" || out.Items[1].Error != "not_run_cancelled" {
+		t.Fatalf("calls %d, items %+v", r.calls, out.Items)
+	}
+}
+
 func (broken) Rank(context.Context, string, []rank.Candidate) ([]rank.Score, error) {
 	return nil, errors.New("failed")
 }

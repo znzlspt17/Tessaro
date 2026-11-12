@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 )
 
 type Terminal struct {
@@ -23,12 +24,14 @@ type part struct {
 }
 type production struct{ parts []part }
 type Grammar struct {
-	Name     string
-	Rules    map[string]json.RawMessage
-	Metadata map[string]json.RawMessage
-	rules    map[string][]production
-	aliases  map[string]string
-	next     int
+	Name      string
+	Rules     map[string]json.RawMessage
+	Metadata  map[string]json.RawMessage
+	rules     map[string][]production
+	aliases   map[string]string
+	next      int
+	minOnce   sync.Once
+	minYields map[string]int
 }
 type rawNode struct {
 	Type    string            `json:"type"`

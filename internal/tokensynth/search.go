@@ -11,23 +11,26 @@ import (
 )
 
 type Event struct {
-	Frontier        []Path                        `json:"frontier,omitempty"`
-	Phase           string                        `json:"phase,omitempty"`
-	Status          string                        `json:"status,omitempty"`
-	Calls           int                           `json:"calls,omitempty"`
-	Candidates      int                           `json:"candidates,omitempty"`
-	ID              string                        `json:"id"`
-	ParentID        string                        `json:"parent_id,omitempty"`
-	Lexeme          string                        `json:"lexeme,omitempty"`
-	TokenKind       string                        `json:"token_kind,omitempty"`
-	Rule            string                        `json:"rule,omitempty"`
-	Reason          string                        `json:"reason"`
-	RejectionReason tokenverify.DeclarationReason `json:"rejection_reason,omitempty"`
-	Step            int                           `json:"step"`
-	Rank            int                           `json:"rank,omitempty"`
-	Score           *float64                      `json:"score,omitempty"`
-	Code            string                        `json:"code,omitempty"`
-	DecisionContext map[string]any                `json:"decision_context,omitempty"`
+	Frontier            []Path                        `json:"frontier,omitempty"`
+	Phase               string                        `json:"phase,omitempty"`
+	Status              string                        `json:"status,omitempty"`
+	Calls               int                           `json:"calls,omitempty"`
+	Candidates          int                           `json:"candidates,omitempty"`
+	ID                  string                        `json:"id"`
+	ParentID            string                        `json:"parent_id,omitempty"`
+	Lexeme              string                        `json:"lexeme,omitempty"`
+	TokenKind           string                        `json:"token_kind,omitempty"`
+	Rule                string                        `json:"rule,omitempty"`
+	Reason              string                        `json:"reason"`
+	RejectionReason     tokenverify.DeclarationReason `json:"rejection_reason,omitempty"`
+	RejectionTokenIndex *int                          `json:"rejection_token_index,omitempty"`
+	Step                int                           `json:"step"`
+	Rank                int                           `json:"rank,omitempty"`
+	Score               *float64                      `json:"score,omitempty"`
+	Code                string                        `json:"code,omitempty"`
+	DecisionContext     map[string]any                `json:"decision_context,omitempty"`
+	ChosenID            string                        `json:"chosen_id,omitempty"`
+	DecisionStatus      string                        `json:"decision_status,omitempty"`
 }
 
 type Path struct {
@@ -38,26 +41,59 @@ type Path struct {
 }
 type Options struct {
 	Strategy                           string
+	DecisionBatchSize                  int
 	MaxTokens, MaxCalls, MaxCandidates int
+	Seed                               int64
+	RemainingTokens                    func(*State) int
+	PublicEvaluate                     func(context.Context, string) (tokenverify.PublicEvaluation, error)
 	Trace                              func(Event)
 	TraceCode                          bool
 }
 type Result struct {
-	GeneratedTokens, ForcedSteps, ModelSteps             int
-	Source                                               string
-	Tokens                                               []string
-	Calls, Candidates, ForcedTokens, ModelSelectedTokens int
+	GeneratedTokens, ForcedSteps, ModelSteps              int
+	Source                                                string
+	Tokens                                                []string
+	Calls, Candidates, ForcedTokens, ModelSelectedTokens  int
+	RejectedQuestions                                     int
+	MemoHits, EvaluationMemoHits, Validations, Expansions int
 }
 
 var ErrNoSolution = errors.New("no solution")
 var ErrBudget = errors.New("token search budget exhausted")
 var ErrCandidateLimit = errors.New("model candidate limit exceeded")
 
+func questionBudgetRejected(err error) bool {
+	var coded interface{ ErrorCode() string }
+	return errors.As(err, &coded) && coded.ErrorCode() == "question_budget_exhausted"
+}
+
+// 2026-11-12: 정책 때문에 거부되는 반환 연산을 모델에도 명시해 문법 제약과 질문의 목표를 일치시킨다.
+func addReturnPolicyContext(context map[string]any, p tokenspec.Problem) {
+	if p.ReturnPolicy == tokenspec.ReturnPolicyValuesOnly {
+		context["return_policy"] = p.ReturnPolicy
+		context["return_policy_instructions"] = "Compute in preceding statements; return only a variable, a scalar literal, or nil when allowed by the return type."
+	}
+}
+
+// 2026-11-12: 반환 프로필 사용 시 확정된 가시 타입만 언어 제약으로 모델에 전달한다.
+func parentDecisionContext(p tokenspec.Problem, s *State) map[string]any {
+	parent := map[string]any{"prefix": s.Source(), "visible_symbols": describe(p, s).visible}
+	if p.ReturnPolicy == tokenspec.ReturnPolicyValuesOnly {
+		if types := VisibleTypes(p, s); len(types) > 0 {
+			parent["visible_types"] = types
+		}
+	}
+	return parent
+}
+
 // 2026-11-05: 빈 소스에서 단일 토큰만 추가하며 완성 프로그램을 선택지로 만들지 않는다.
 func Search(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Options, check func(string) (bool, error)) (out Result, err error) {
 	return searchFrom(ctx, p, r, o, check, nil)
 }
 func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Options, check func(string) (bool, error), initial []*State) (out Result, err error) {
+	if o.Strategy == "lds" || o.Strategy == "levin" || o.Strategy == "phs" || o.Strategy == "mcts" {
+		return researchSearch(ctx, p, r, o, check, initial)
+	}
 	if err := p.Validate(); err != nil {
 		return out, err
 	}
@@ -98,9 +134,9 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 			o.Trace(Event{ID: id, ParentID: parent, Lexeme: c.Lexeme, TokenKind: c.Kind, Rule: c.Rule, Reason: "declaration_rejected", RejectionReason: reason, Step: step, Calls: out.Calls, Candidates: out.Candidates})
 		}
 	}
-	rejectBody := func(id, parent string, c Choice, reason tokenverify.DeclarationReason) {
+	rejectBody := func(id, parent string, c Choice, reason tokenverify.DeclarationReason, index *int) {
 		if o.Trace != nil {
-			o.Trace(Event{ID: id, ParentID: parent, Lexeme: c.Lexeme, TokenKind: c.Kind, Rule: c.Rule, Reason: "body_rejected", RejectionReason: reason, Step: step, Calls: out.Calls, Candidates: out.Candidates})
+			o.Trace(Event{ID: id, ParentID: parent, Lexeme: c.Lexeme, TokenKind: c.Kind, Rule: c.Rule, Reason: "body_rejected", RejectionReason: reason, RejectionTokenIndex: index, Step: step, Calls: out.Calls, Candidates: out.Candidates})
 		}
 	}
 	emit := func(id, parent, reason string, c Choice, s *State, score *float64, rankIndex int) {
@@ -127,6 +163,7 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 		o.Trace(Event{ID: "frontier", Reason: "frontier", Step: step, Frontier: snapshot, Calls: out.Calls, Candidates: out.Candidates})
 	}
 	finish := func(s *State) (bool, error) {
+		out.Validations++
 		emit(s.ID, s.ParentID, "validation_started", Choice{}, s, nil, 0)
 		ok, e := check(s.Source())
 		emit(s.ID, s.ParentID, "validation_finished", Choice{}, s, nil, 0)
@@ -157,8 +194,20 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 			reject(state.ID, state.ParentID, Choice{}, declaration.Reason)
 			continue
 		}
+		if index := state.priorBoolOrdering(); index != nil {
+			rejectBody(state.ID, state.ParentID, Choice{}, "bool_order_comparison", index)
+			continue
+		}
 		if reason := tokenverify.CheckBodyPrefix(p, state.Tokens); reason != "" {
-			rejectBody(state.ID, state.ParentID, Choice{}, reason)
+			rejectBody(state.ID, state.ParentID, Choice{}, reason, nil)
+			continue
+		}
+		if reason := tokenverify.CheckReturnPrefix(p, state.Tokens); reason != "" {
+			rejectBody(state.ID, state.ParentID, Choice{}, reason, nil)
+			continue
+		}
+		if state.irrecoverableExpression("") {
+			rejectBody(state.ID, state.ParentID, Choice{}, "irrecoverable_expression_statement", nil)
 			continue
 		}
 		validInitial = append(validInitial, state)
@@ -214,6 +263,7 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 					break
 				}
 				rawChoices, rejectedChoices, exhausted, e := candidatesWithin(p, state, o.MaxCandidates-out.Candidates)
+				out.Expansions++
 				if e != nil {
 					return out, e
 				}
@@ -234,7 +284,24 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 					check  tokenverify.DeclarationCheck
 				}
 				choices := make([]checkedChoice, 0, len(rawChoices))
+				boolOrdering := false
+				for _, c := range rawChoices {
+					if orderingOperator(c.Lexeme) {
+						boolOrdering = state.comparisonResultBefore(len(state.Tokens))
+						break
+					}
+				}
 				for _, choice := range rawChoices {
+					// 2026-11-12: 선택되거나 강제되기 전에 반환 프로필을 검사해 금지된 토큰을 모델에 노출하지 않는다.
+					tokens := append(append([]string(nil), state.Tokens...), choice.Lexeme)
+					if reason := tokenverify.CheckReturnPrefix(p, tokens); reason != "" {
+						if out.Candidates >= o.MaxCandidates {
+							return out, ErrBudget
+						}
+						out.Candidates++
+						rejectBody(fmt.Sprintf("%08d", out.Candidates), state.ID, choice, reason, nil)
+						continue
+					}
 					checked, e := state.checkCandidateDeclaration(p, choice)
 					if e != nil {
 						return out, e
@@ -248,14 +315,31 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 						reject(id, state.ID, choice, checked.Reason)
 						continue
 					}
-					if choice.Lexeme == ";" || choice.Lexeme == "}" || choice.Lexeme == "{" {
+					if boolOrdering && orderingOperator(choice.Lexeme) {
+						if out.Candidates >= o.MaxCandidates {
+							return out, ErrBudget
+						}
+						out.Candidates++
+						index := len(state.Tokens)
+						rejectBody(fmt.Sprintf("%08d", out.Candidates), state.ID, choice, "bool_order_comparison", &index)
+						continue
+					}
+					if state.irrecoverableExpression(choice.Lexeme) {
+						if out.Candidates >= o.MaxCandidates {
+							return out, ErrBudget
+						}
+						out.Candidates++
+						rejectBody(fmt.Sprintf("%08d", out.Candidates), state.ID, choice, "irrecoverable_expression_statement", nil)
+						continue
+					}
+					if choice.Lexeme == ";" || choice.Lexeme == "}" || choice.Lexeme == "{" || choice.Lexeme == "(" {
 						tokens := append(append([]string(nil), state.Tokens...), choice.Lexeme)
 						if reason := tokenverify.CheckBodyPrefix(p, tokens); reason != "" {
 							if out.Candidates >= o.MaxCandidates {
 								return out, ErrBudget
 							}
 							out.Candidates++
-							rejectBody(fmt.Sprintf("%08d", out.Candidates), state.ID, choice, reason)
+							rejectBody(fmt.Sprintf("%08d", out.Candidates), state.ID, choice, reason, nil)
 							continue
 						}
 					}
@@ -297,7 +381,7 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 					frontier(states)
 					continue
 				}
-				parents[state.ID] = map[string]any{"prefix": state.Source(), "visible_symbols": describe(p, state).visible}
+				parents[state.ID] = parentDecisionContext(p, state)
 				for _, candidate := range choices {
 					c := candidate.choice
 					if out.Candidates >= o.MaxCandidates {
@@ -328,20 +412,61 @@ func searchFrom(ctx context.Context, p tokenspec.Problem, r rank.Ranker, o Optio
 			return out, ErrBudget
 		}
 		contextData := map[string]any{"intent": p.Intent, "inputs": p.Inputs, "allowed_types": p.AllowedTypes, "literals": p.Literals, "type_hints": p.TypeHints, "output_type_hint": p.OutputTypeHint, "public_tests": p.PublicTests, "parents": parents}
+		addReturnPolicyContext(contextData, p)
 		stateData, _ := json.Marshal(contextData)
 		if o.Trace != nil {
-			o.Trace(Event{ID: "model", Reason: "decision_context", DecisionContext: contextData, Step: step, Calls: out.Calls, Candidates: out.Candidates})
+			if _, _, err := rank.ChoiceQuestion(candidates); err != nil {
+				return out, err
+			}
+			traceContext := researchTraceContext(rank.DecisionRequest{State: string(stateData), Candidates: candidates}, false)
+			o.Trace(Event{ID: "model", Reason: "decision_context", DecisionContext: traceContext, Step: step, Calls: out.Calls, Candidates: out.Candidates})
 		}
 		out.Calls++
 		emit("model", "", "model_started", Choice{}, nil, nil, 0)
-		scores, e := r.Rank(ctx, string(stateData), candidates)
+		var scores []rank.Score
+		var chosen string
+		var e error
+		if dr, ok := r.(rank.DecisionRanker); ok {
+			var d rank.Decision
+			d, e = dr.RankDecision(ctx, string(stateData), candidates)
+			scores, chosen = d.Scores, d.ChosenID
+		} else {
+			scores, e = r.Rank(ctx, string(stateData), candidates)
+		}
 		emit("model", "", "model_finished", Choice{}, nil, nil, 0)
 		if e != nil {
+			if questionBudgetRejected(e) {
+				out.RejectedQuestions++
+			}
+			if o.Trace != nil {
+				o.Trace(Event{ID: "model", Reason: "decision_result", DecisionStatus: "failed", Step: step, Calls: out.Calls, Candidates: out.Candidates})
+			}
 			return out, e
 		}
 		ordered, e := rank.Order(candidates, scores)
 		if e != nil {
+			if o.Trace != nil {
+				o.Trace(Event{ID: "model", Reason: "decision_result", DecisionStatus: "failed", Step: step, Calls: out.Calls, Candidates: out.Candidates})
+			}
 			return out, e
+		}
+		if chosen != "" {
+			found := false
+			for _, candidate := range candidates {
+				if candidate.ID == chosen {
+					found = true
+					break
+				}
+			}
+			if !found {
+				if o.Trace != nil {
+					o.Trace(Event{ID: "model", Reason: "decision_result", DecisionStatus: "failed", Step: step, Calls: out.Calls, Candidates: out.Candidates})
+				}
+				return out, fmt.Errorf("unknown chosen candidate")
+			}
+		}
+		if o.Trace != nil {
+			o.Trace(Event{ID: "model", Reason: "decision_result", ChosenID: chosen, DecisionStatus: "received", Step: step, Calls: out.Calls, Candidates: out.Candidates})
 		}
 		scoreByID := map[string]float64{}
 		for _, s := range scores {

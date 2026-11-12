@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"jevcancode/internal/tokenspec"
 	"strings"
 )
@@ -14,6 +15,9 @@ func CheckBodyPrefix(p tokenspec.Problem, tokens []string) DeclarationReason {
 		return ""
 	}
 	last := tokens[len(tokens)-1]
+	if last == "(" {
+		return checkNonCallablePrefix(tokens)
+	}
 	if last != ";" && last != "}" && last != "{" {
 		return ""
 	}
@@ -123,4 +127,68 @@ func CheckBodyPrefix(p tokenspec.Problem, tokens []string) DeclarationReason {
 		return ""
 	}
 	return block(fn.Body, 0, 0)
+}
+
+// 2026-11-07: 완성 가능한 호출만 임시로 닫아 타입이 확정된 변수 호출을 조기에 배제한다.
+// 파싱이나 타입 판정이 불확실하면 미완성 경로를 보존한다.
+func checkNonCallablePrefix(tokens []string) DeclarationReason {
+	depth := 0
+	parens := 0
+	for _, tok := range tokens {
+		switch tok {
+		case "{":
+			depth++
+		case "}":
+			depth--
+		case "(":
+			parens++
+		case ")":
+			parens--
+		}
+		if depth < 0 || parens < 0 {
+			return ""
+		}
+	}
+	if depth == 0 {
+		return ""
+	}
+	source := strings.Join(tokens, " ")
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, "prefix.go", source+" 0"+strings.Repeat(" )", parens)+strings.Repeat(" }", depth), 0)
+	if err != nil {
+		return ""
+	}
+	info := types.Info{Uses: map[*ast.Ident]types.Object{}}
+	config := types.Config{Error: func(error) {}}
+	_, _ = config.Check("prefix", fset, []*ast.File{file}, &info)
+	var rejected bool
+	ast.Inspect(file, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok || fset.Position(call.Lparen).Offset != len(source)-1 {
+			return true
+		}
+		target := call.Fun
+		for {
+			paren, ok := target.(*ast.ParenExpr)
+			if !ok {
+				break
+			}
+			target = paren.X
+		}
+		id, ok := target.(*ast.Ident)
+		if !ok {
+			return true
+		}
+		obj, ok := info.Uses[id].(*types.Var)
+		if !ok || obj.Type() == nil || obj.Type() == types.Typ[types.Invalid] {
+			return true
+		}
+		_, callable := obj.Type().Underlying().(*types.Signature)
+		rejected = !callable
+		return true
+	})
+	if rejected {
+		return "non_callable"
+	}
+	return ""
 }

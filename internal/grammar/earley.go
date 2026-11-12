@@ -133,7 +133,8 @@ func (s *State) Advance(lexeme string) (*State, error) {
 	if s == nil || s.grammar == nil || len(s.charts) == 0 {
 		return nil, fmt.Errorf("invalid parser state")
 	}
-	next := s.Clone()
+	// 2026-11-12: 완료된 차트는 변경하지 않으므로 새 차트만 소유하고 과거 항목을 공유한다.
+	next := &State{grammar: s.grammar, start: s.start, charts: append([]chart(nil), s.charts...)}
 	old := &s.charts[len(s.charts)-1]
 	c := chart{}
 	for _, it := range old.items {
@@ -156,17 +157,149 @@ func (s *State) Accepts() bool {
 	}
 	return s.charts[len(s.charts)-1].seen[item{lhs: startSymbol, dot: 1}]
 }
+
+// 2026-11-08: 완결된 실제 식의 시작 위치를 복사해 반환하며 차트는 변경하지 않는다.
+func (s *State) CompletedOrigins(position int, rule string) []int {
+	if s == nil || s.grammar == nil || position < 0 || position >= len(s.charts) {
+		return nil
+	}
+	seen := map[int]bool{}
+	var result []int
+	for _, it := range s.charts[position].items {
+		if it.lhs == rule && it.dot == len(s.production(it).parts) && !seen[it.origin] {
+			seen[it.origin] = true
+			result = append(result, it.origin)
+		}
+	}
+	sort.Ints(result)
+	return result
+}
+
+// 2026-11-08: Earley 상위 경로를 과대 추정하여 모든 해석이 문장 왼쪽인 경우에만 확정한다.
+// 알 수 없는 규칙, 조건식, 호출·인덱스 등은 유효한 다른 해석으로 남겨 둔다.
+func (s *State) BinaryOnlyStatementLeft(position int, operator string) bool {
+	return s.onlyStatementLeft(position, operator, "binary_expression")
+}
+
+// 2026-11-12: 논리 부정의 결과는 호출·대입·전송 대상이 될 수 없으므로 모든 상위 경로가
+// 독립 문장 왼쪽일 때만 거부한다. 괄호나 다른 미확정 상위 해석은 기존처럼 보존한다.
+func (s *State) NotOnlyStatementLeft(position int) bool {
+	return s.onlyStatementLeft(position, "!", "unary_expression")
+}
+
+func (s *State) onlyStatementLeft(position int, operator, operatorRule string) bool {
+	if s == nil || s.grammar == nil || position < 1 || position >= len(s.charts) {
+		return false
+	}
+	type key struct {
+		symbol, alias    string
+		position, origin int
+	}
+	visiting := map[key]bool{}
+	memo := map[key]bool{}
+	done := map[key]bool{}
+	statementFound := false
+	var walk func(string, string, int, int) bool
+	walk = func(symbol, alias string, position, origin int) bool {
+		k := key{symbol, alias, position, origin}
+		if visiting[k] {
+			return true
+		}
+		if done[k] {
+			return memo[k]
+		}
+		visiting[k] = true
+		found, safe := false, true
+		if position < 0 || position >= len(s.charts) {
+			return false
+		}
+		for _, parent := range s.charts[position].items {
+			p := s.production(parent)
+			if parent.dot >= len(p.parts) {
+				continue
+			}
+			expected := p.parts[parent.dot]
+			if expected.terminal != nil || expected.symbol != symbol || s.aliasFor(parent, symbol) != alias {
+				continue
+			}
+			found = true
+			if origin < 0 {
+				if parent.lhs == operatorRule {
+					if !walk(parent.lhs, parent.alias, parent.origin, parent.origin) {
+						safe = false
+					}
+				} else if len(parent.lhs) > 0 && parent.lhs[0] == 0 {
+					if !walk(parent.lhs, parent.alias, parent.origin, origin) {
+						safe = false
+					}
+				} else {
+					safe = false
+				}
+				continue
+			}
+			switch parent.lhs {
+			case "expression_statement", "assignment_statement", "inc_statement", "dec_statement", "send_statement", "short_var_declaration":
+				if parent.origin != origin {
+					safe = false
+				} else {
+					statementFound = true
+				}
+			case "_expression", "expression_list", "binary_expression":
+				if parent.origin != origin || !walk(parent.lhs, parent.alias, parent.origin, origin) {
+					safe = false
+				}
+			case "selector_expression", "slice_expression", "index_expression", "type_assertion_expression", "call_expression":
+				// 괄호 없는 후위 연산자는 이항식이 아니라 오른쪽 피연산자에 결합된다.
+				if parent.origin != origin {
+					safe = false
+				}
+			default:
+				if len(parent.lhs) > 0 && parent.lhs[0] == 0 {
+					if !walk(parent.lhs, parent.alias, parent.origin, origin) {
+						safe = false
+					}
+				} else {
+					safe = false
+				}
+			}
+		}
+		delete(visiting, k)
+		done[k] = true
+		memo[k] = found && safe
+		return memo[k]
+	}
+	found := false
+	for _, it := range s.charts[position].items {
+		if it.dot == 0 {
+			continue
+		}
+		part := s.production(it).parts[it.dot-1]
+		if part.terminal == nil || part.terminal.Rule != operatorRule || part.terminal.Value != operator {
+			continue
+		}
+		found = true
+		if !walk(it.lhs, it.alias, it.origin, -1) {
+			return false
+		}
+	}
+	return found && statementFound
+}
+
+// 2026-11-12: 과거 차트는 불변으로 공유하고 현재 차트는 독립적으로 복사한다.
 func (s *State) Clone() *State {
 	if s == nil {
 		return nil
 	}
-	out := &State{grammar: s.grammar, start: s.start, charts: make([]chart, len(s.charts))}
-	for i, c := range s.charts {
-		out.charts[i].items = append([]item(nil), c.items...)
-		out.charts[i].seen = make(map[item]bool, len(c.seen))
-		for k, v := range c.seen {
-			out.charts[i].seen[k] = v
-		}
+	out := &State{grammar: s.grammar, start: s.start, charts: append([]chart(nil), s.charts...)}
+	if len(out.charts) == 0 {
+		return out
+	}
+	i := len(out.charts) - 1
+	c := s.charts[i]
+	out.charts[i].items = append([]item(nil), c.items...)
+	out.charts[i].seen = make(map[item]bool, len(c.seen))
+	for k, v := range c.seen {
+		out.charts[i].seen[k] = v
 	}
 	return out
 }

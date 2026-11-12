@@ -10,6 +10,7 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
+	"jevcancode/internal/process"
 	"jevcancode/internal/spec"
 	"jevcancode/internal/synth"
 	"os"
@@ -165,6 +166,19 @@ func Source(p spec.Problem, body string) (string, error) {
 	for _, a := range p.Params {
 		names[a.Name] = true
 	}
+	// 2026-11-12: 계산과 반환을 분리하는 프로필은 기존 흐름 검사에 앞서 반환식만 제한한다.
+	if p.ReturnPolicy == spec.ReturnPolicyValuesOnly {
+		valid := true
+		ast.Inspect(fn.Body, func(n ast.Node) bool {
+			if r, ok := n.(*ast.ReturnStmt); ok && (len(r.Results) != 1 || !returnAtom(r.Results[0])) {
+				valid = false
+			}
+			return true
+		})
+		if !valid {
+			return "", fmt.Errorf("return computation not allowed")
+		}
+	}
 	flow := flowCheck{used: map[string]bool{}, maxLocals: 2, maxStatements: 8, maxDepth: 4}
 	if p.Budgets != nil {
 		if p.Budgets.MaxDepth != nil {
@@ -242,7 +256,7 @@ func check(ctx context.Context, p spec.Problem, body string, tests []spec.Test, 
 	if len(tests) == 0 {
 		return false, fmt.Errorf("tests required")
 	}
-	dir, err := os.MkdirTemp("", "jevcancoding-*")
+	dir, err := os.MkdirTemp("", "jevcancode-*")
 	if err != nil {
 		return false, err
 	}
@@ -295,7 +309,7 @@ func check(ctx context.Context, p spec.Problem, body string, tests []spec.Test, 
 		*attempted = true
 	}
 	started := time.Now()
-	err = cmd.Run()
+	err = process.RunContext(ctx, cmd)
 	if timing != nil {
 		timing.Compile = time.Since(started)
 	}
@@ -313,7 +327,7 @@ func check(ctx context.Context, p spec.Problem, body string, tests []spec.Test, 
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	started = time.Now()
-	err = cmd.Run()
+	err = process.RunContext(ctx, cmd)
 	if timing != nil {
 		timing.Execute = time.Since(started)
 	}
@@ -327,4 +341,19 @@ func check(ctx context.Context, p spec.Problem, body string, tests []spec.Test, 
 		return false, err
 	}
 	return true, nil
+}
+
+func returnAtom(e ast.Expr) bool {
+	switch x := e.(type) {
+	case *ast.ParenExpr:
+		return returnAtom(x.X)
+	case *ast.Ident:
+		return true
+	case *ast.BasicLit:
+		return x.Kind == token.INT || x.Kind == token.STRING
+	case *ast.UnaryExpr:
+		lit, ok := x.X.(*ast.BasicLit)
+		return x.Op == token.SUB && ok && lit.Kind == token.INT
+	}
+	return false
 }

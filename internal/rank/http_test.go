@@ -80,3 +80,25 @@ func TestHTTPReportsOptionalUsage(t *testing.T) {
 		t.Fatalf("%+v %v", u, err)
 	}
 }
+
+func TestHTTPSafeErrorCodes(t *testing.T) {
+	cases := []struct {
+		name    string
+		handler http.HandlerFunc
+		want    string
+	}{
+		{"status", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusTooManyRequests) }, "http_429"},
+		{"response", func(w http.ResponseWriter, _ *http.Request) { _, _ = w.Write([]byte("bad")) }, "invalid_response"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(tc.handler)
+			defer server.Close()
+			_, err := (&HTTP{URL: server.URL, Model: "test"}).Rank(context.Background(), "x", []Candidate{{ID: "a"}, {ID: "b"}})
+			var coded interface{ ErrorCode() string }
+			if !errors.As(err, &coded) || coded.ErrorCode() != tc.want {
+				t.Fatalf("code missing: %v", err)
+			}
+		})
+	}
+}

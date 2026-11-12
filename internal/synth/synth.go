@@ -54,6 +54,7 @@ type node struct {
 	id              string
 	scope           []localSymbol
 	allowStop       bool
+	returnAtom      bool
 	children        []*node
 }
 type localSymbol struct {
@@ -134,7 +135,9 @@ func render(n *node) string {
 func choices(h *node, p spec.Problem, maxDepth int) []*node {
 	d := h.depth
 	if h.typ == "stmt" {
-		out := []*node{{kind: "return", children: []*node{scopedHole(p.ReturnType, d, h.scope)}}}
+		ret := scopedHole(p.ReturnType, d, h.scope)
+		ret.returnAtom = p.ReturnPolicy == spec.ReturnPolicyValuesOnly
+		out := []*node{{kind: "return", children: []*node{ret}}}
 		if h.allowStop {
 			out = append(out, &node{kind: "empty"})
 		}
@@ -164,7 +167,8 @@ func choices(h *node, p spec.Problem, maxDepth int) []*node {
 	} else {
 		out = append(out, &node{kind: "atom", text: "true"}, &node{kind: "atom", text: "false"})
 	}
-	if d >= maxDepth {
+	// 2026-11-12: 반환 원자만 제한하고 지역변수 계산 선택지는 유지한다.
+	if d >= maxDepth || h.returnAtom {
 		return out
 	}
 	if h.typ == "int" {

@@ -138,3 +138,19 @@ func TestCloneDoesNotShareLocalBindings(t *testing.T) {
 		t.Fatal("branch changed its parent's binding")
 	}
 }
+
+func TestValuesOnlyReturnChoicesKeepCalculationInAssignments(t *testing.T) {
+	p := spec.Problem{ReturnType: "int", Params: []spec.Param{{Name: "x", Type: "int"}}, Constants: []int{1}, ReturnPolicy: spec.ReturnPolicyValuesOnly}
+	statement := choices(hole("stmt", 0), p, 4)[0]
+	for _, c := range choices(statement.children[0], p, 4) {
+		if c.kind == "bin" || c.kind == "unary" {
+			t.Fatalf("computed return choice: %+v", c)
+		}
+	}
+	for _, c := range choices(scopedHole("int", 0, nil), p, 4) {
+		if c.kind == "bin" {
+			return
+		}
+	}
+	t.Fatal("assignment expressions lost computation")
+}

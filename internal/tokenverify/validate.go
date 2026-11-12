@@ -292,6 +292,19 @@ func Validate(p tokenspec.Problem, source string) (*Binding, error) {
 	if !ok || fn.Recv != nil || fn.Type.TypeParams != nil || fn.Name.Name == "main" || fn.Name.Name == "init" || fn.Body == nil {
 		return nil, fmt.Errorf("invalid function")
 	}
+	// 2026-11-12: 프로필은 계산을 반환 전에 명시하게 하며 타입 적합성은 기존 타입 검사에 맡긴다.
+	if p.ReturnPolicy == tokenspec.ReturnPolicyValuesOnly {
+		valid := true
+		ast.Inspect(fn.Body, func(n ast.Node) bool {
+			if r, ok := n.(*ast.ReturnStmt); ok && (len(r.Results) != 1 || !returnAtom(r.Results[0])) {
+				valid = false
+			}
+			return true
+		})
+		if !valid {
+			return nil, fmt.Errorf("return computation not allowed")
+		}
+	}
 	c := checker{maxStatements: limit(p.Budgets.MaxStatements, 32, 128), maxNesting: limit(p.Budgets.MaxNesting, 4, 8)}
 	if !c.block(fn.Body, 0, 0) {
 		return nil, fmt.Errorf("unsupported statement or expression")

@@ -88,10 +88,24 @@ func (m Manifest) Validate() error {
 
 // 2026-11-05: 실패도 전체 문제 수에 포함하여 모델 오류를 성공률에서 숨기지 않는다.
 func Run(ctx context.Context, m Manifest, r rank.Ranker) Report {
+	return RunWithProgress(ctx, m, r, nil)
+}
+
+// 2026-11-07: 실행 진행 알림은 기록과 분리해 완료된 문제 수만 전달한다.
+func RunWithProgress(ctx context.Context, m Manifest, r rank.Ranker, progress func(int, int)) Report {
 	out := Report{Total: len(m.Problems), EvaluationKind: "complete_candidate_selection"}
 	var hits, rr, recall, top3hits float64
 	for _, p := range m.Problems {
 		item := Item{ID: p.ID}
+		// 2026-11-07: 취소 후 추가 추론을 막고 원시 모델 진단이 결과에 저장되지 않게 한다.
+		if ctx.Err() != nil {
+			item.Error = "not_run_cancelled"
+			out.Items = append(out.Items, item)
+			if progress != nil {
+				progress(len(out.Items), out.Total)
+			}
+			continue
+		}
 		start := time.Now()
 		state := p.Intent
 		if p.CodePrefix != "" {
@@ -112,8 +126,11 @@ func Run(ctx context.Context, m Manifest, r rank.Ranker) Report {
 		}
 		if err != nil {
 			out.Failed++
-			item.Error = err.Error()
+			item.Error = "model_error"
 			out.Items = append(out.Items, item)
+			if progress != nil {
+				progress(len(out.Items), out.Total)
+			}
 			continue
 		}
 		answers := map[string]bool{}
@@ -144,6 +161,9 @@ func Run(ctx context.Context, m Manifest, r rank.Ranker) Report {
 			top3hits++
 		}
 		out.Items = append(out.Items, item)
+		if progress != nil {
+			progress(len(out.Items), out.Total)
+		}
 	}
 	if out.Total > 0 {
 		out.Top1 = hits / float64(out.Total)

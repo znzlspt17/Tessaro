@@ -28,7 +28,11 @@ type Budgets struct {
 	MaxNesting     int  `json:"max_nesting,omitempty"`
 	TimeoutSeconds int  `json:"timeout_seconds,omitempty"`
 }
+
+const ReturnPolicyValuesOnly = "values-only-v1"
+
 type Problem struct {
+	ReturnPolicy   string            `json:"return_policy,omitempty"`
 	Intent         string            `json:"intent"`
 	Inputs         []string          `json:"inputs"`
 	AllowedTypes   []string          `json:"allowed_types"`
@@ -100,6 +104,9 @@ func DecodeTests(r io.Reader, p Problem) ([]Test, error) {
 	return tests, nil
 }
 func (p Problem) Validate() error {
+	if p.ReturnPolicy != "" && p.ReturnPolicy != ReturnPolicyValuesOnly {
+		return fmt.Errorf("invalid return policy")
+	}
 	if strings.TrimSpace(p.Intent) == "" || len(p.Inputs) > 8 || len(p.PublicTests) == 0 {
 		return fmt.Errorf("intent, at most 8 input names and public tests are required")
 	}

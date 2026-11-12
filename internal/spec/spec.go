@@ -18,14 +18,18 @@ type Test struct {
 	Args []any `json:"args"`
 	Want any   `json:"want"`
 }
+
+const ReturnPolicyValuesOnly = "values-only-v1"
+
 type Problem struct {
-	Intent      string   `json:"intent"`
-	Name        string   `json:"name"`
-	Params      []Param  `json:"params"`
-	ReturnType  string   `json:"return_type"`
-	Constants   []int    `json:"constants"`
-	PublicTests []Test   `json:"public_tests"`
-	Budgets     *Budgets `json:"budgets,omitempty"`
+	ReturnPolicy string   `json:"return_policy,omitempty"`
+	Intent       string   `json:"intent"`
+	Name         string   `json:"name"`
+	Params       []Param  `json:"params"`
+	ReturnType   string   `json:"return_type"`
+	Constants    []int    `json:"constants"`
+	PublicTests  []Test   `json:"public_tests"`
+	Budgets      *Budgets `json:"budgets,omitempty"`
 }
 type Budgets struct {
 	MaxLocals      *int `json:"max_locals,omitempty"`
@@ -71,6 +75,9 @@ func validName(s string) bool {
 	return token.IsIdentifier(s) && s != "_" && s != "true" && s != "false" && s != "int" && s != "bool"
 }
 func (p Problem) Validate() error {
+	if p.ReturnPolicy != "" && p.ReturnPolicy != ReturnPolicyValuesOnly {
+		return fmt.Errorf("invalid return policy")
+	}
 	if p.Budgets != nil {
 		if v := p.Budgets.MaxLocals; v != nil && (*v < 0 || *v > 63) {
 			return fmt.Errorf("invalid local budget")

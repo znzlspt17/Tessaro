@@ -3,10 +3,14 @@ package runner
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"jevcancode/internal/rank"
 	"jevcancode/internal/tokenspec"
 	"jevcancode/internal/tokensynth"
+	"math"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 )
@@ -190,5 +194,192 @@ func TestTokenTraceCodeControlsDecisionContext(t *testing.T) {
 	}})
 	if !sawContext {
 		t.Fatal("explicit decision context opt-in was ignored")
+	}
+}
+
+func TestTokenRunnerResearchStrategyAndReturnPolicy(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := RunToken(context.Background(), p, rank.Fake{}, Request{Strategy: "lds", ReturnPolicy: tokenspec.ReturnPolicyValuesOnly, Seed: 42, MaxCandidates: 1})
+	if out.Status != "budget_exhausted" {
+		t.Fatalf("research strategy rejected: %+v", out)
+	}
+}
+
+func TestTokenRunnerReportsQuestionAndUnavailableHTTPCount(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := RunToken(context.Background(), p, rank.Fake{}, Request{Strategy: "lds", MaxCalls: 1})
+	data, _ := json.Marshal(out)
+	var fields map[string]any
+	if err := json.Unmarshal(data, &fields); err != nil {
+		t.Fatal(err)
+	}
+	if fields["questions"] != float64(1) {
+		t.Fatalf("questions unavailable: %s", data)
+	}
+	if v, ok := fields["http_requests"]; !ok || v != nil {
+		t.Fatalf("unknown HTTP count not null: %s", data)
+	}
+}
+
+type runnerCategorical struct{ *scriptedTokenRanker }
+
+func (runnerCategorical) NormalizedCategorical() bool { return true }
+func (r runnerCategorical) RankDecision(ctx context.Context, state string, cs []rank.Candidate) (rank.Decision, error) {
+	scores, usage, err := r.RankWithUsage(ctx, state, cs)
+	if err != nil {
+		return rank.Decision{}, err
+	}
+	best := 0
+	for i := range scores {
+		if scores[i].Score > scores[best].Score {
+			best = i
+		}
+	}
+	for i := range scores {
+		scores[i].Score = 0
+	}
+	scores[best].Score = 1
+	return rank.Decision{Scores: scores, ChosenID: scores[best].ID, Usage: usage}, nil
+}
+func TestMCTSPublicEvaluationCountsCompilation(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := runnerCategorical{&scriptedTokenRanker{target: "package main ; func f0 ( x int ) int { return x ; }"}}
+	result := RunToken(context.Background(), p, r, Request{Strategy: "mcts", Seed: 42, MaxCalls: 100, MaxCandidates: 10000})
+	if result.Status != "success" || result.CompileAttempts < 2 || result.CompilePasses < 2 || result.PhaseMS["compile"] <= 0 || result.Validations < 2 {
+		t.Fatalf("missing rollout or final compile: %+v", result)
+	}
+}
+
+func TestTokenRunnerReportsSafeHTTPFailureAndRequestCount(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusTooManyRequests)
+		_, _ = w.Write([]byte("private server detail"))
+	}))
+	defer server.Close()
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := RunToken(context.Background(), p, &rank.HTTP{URL: server.URL, Model: "test"}, Request{Strategy: "lds"})
+	data, _ := json.Marshal(result)
+	if result.Status != "model_error" || result.ErrorCode != "http_429" || result.HTTPRequests == nil || *result.HTTPRequests != 1 || result.Questions != 1 || strings.Contains(string(data), "private server detail") {
+		t.Fatalf("result=%s", data)
+	}
+}
+
+func TestBaselineReportsCandidateExpansions(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := RunToken(context.Background(), p, rank.Fake{}, Request{Strategy: "beam", MaxCalls: 1})
+	if result.Expansions == 0 || result.Questions != 1 {
+		t.Fatalf("missing baseline metrics: %+v", result)
+	}
+}
+
+func TestRunnerRejectsBatchForMCTSAndLegacyStrategies(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, strategy := range []string{"mcts", "beam", "greedy", "strict-greedy"} {
+		t.Run(strategy, func(t *testing.T) {
+			result := RunToken(context.Background(), p, rank.Fake{}, Request{Strategy: strategy, DecisionBatchSize: 2})
+			if result.Status != "input_error" {
+				t.Fatalf("batch silently ignored: %+v", result)
+			}
+		})
+	}
+}
+
+type partialUsageRanker struct{ calls int }
+
+func (r *partialUsageRanker) Rank(ctx context.Context, state string, cs []rank.Candidate) ([]rank.Score, error) {
+	d, e := r.RankDecision(ctx, state, cs)
+	return d.Scores, e
+}
+func (r *partialUsageRanker) RankDecision(_ context.Context, _ string, cs []rank.Candidate) (rank.Decision, error) {
+	r.calls++
+	if r.calls > 1 {
+		return rank.Decision{}, errors.New("safe fixture failure")
+	}
+	in, out := 7, 2
+	scores := make([]rank.Score, len(cs))
+	for i, c := range cs {
+		scores[i] = rank.Score{ID: c.ID, Score: float64(len(cs) - i)}
+	}
+	return rank.Decision{Scores: scores, ChosenID: cs[0].ID, Usage: &rank.Usage{InputTokens: &in, OutputTokens: &out}}, nil
+}
+func TestKnownUsageSurvivesLaterUnknownModelFailure(t *testing.T) {
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	inPrice, outPrice := 1.0, 2.0
+	result := RunToken(context.Background(), p, &partialUsageRanker{}, Request{Strategy: "lds", MaxCalls: 3, InputPrice: &inPrice, OutputPrice: &outPrice})
+	data, _ := json.Marshal(result)
+	var fields struct {
+		Usage              *rank.Usage `json:"usage"`
+		KnownUsage         *rank.Usage `json:"known_usage"`
+		EstimatedCost      *float64    `json:"estimated_cost"`
+		KnownEstimatedCost *float64    `json:"known_estimated_cost"`
+	}
+	if err := json.Unmarshal(data, &fields); err != nil {
+		t.Fatal(err)
+	}
+	if result.Status != "model_error" || fields.Usage == nil || fields.Usage.InputTokens != nil || fields.Usage.OutputTokens != nil || fields.EstimatedCost != nil {
+		t.Fatalf("total falsely known: %s", data)
+	}
+	if fields.KnownUsage == nil || fields.KnownUsage.InputTokens == nil || *fields.KnownUsage.InputTokens != 7 || fields.KnownUsage.OutputTokens == nil || *fields.KnownUsage.OutputTokens != 2 || fields.KnownEstimatedCost == nil || math.Abs(*fields.KnownEstimatedCost-0.000011) > 1e-12 {
+		t.Fatalf("known subtotal lost: %s", data)
+	}
+}
+
+func TestObservedHTTPRequestsAndUsageSurviveLaterHTTPFailure(t *testing.T) {
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		if requests == 2 {
+			w.WriteHeader(http.StatusTooManyRequests)
+			return
+		}
+		var request struct {
+			Questions map[string]struct {
+				Criteria map[string]any `json:"criteria"`
+			} `json:"questions"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			t.Error(err)
+			return
+		}
+		probabilities := map[string]float64{}
+		chosen := ""
+		for id := range request.Questions["pick"].Criteria {
+			probabilities[id] = 0
+			if chosen == "" {
+				chosen = id
+			}
+		}
+		probabilities[chosen] = 1
+		_ = json.NewEncoder(w).Encode(map[string]any{"model": "test", "usage": map[string]int{"input_tokens": 7, "output_tokens": 2}, "answers": map[string]any{"pick": map[string]any{"type": "choice", "choice": chosen, "probabilities": probabilities}}})
+	}))
+	defer server.Close()
+	p, err := tokenspec.Decode(strings.NewReader(`{"intent":"identity","inputs":["x"],"allowed_types":["int"],"public_tests":[{"inputs":{"x":1},"want":1}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := RunToken(context.Background(), p, &rank.HTTP{URL: server.URL, Model: "test"}, Request{Strategy: "lds", MaxCalls: 3})
+	if result.Status != "model_error" || result.ErrorCode != "http_429" || result.HTTPRequests == nil || *result.HTTPRequests != 2 || result.Questions != 2 || result.Usage == nil || result.Usage.InputTokens != nil || result.KnownUsage == nil || result.KnownUsage.InputTokens == nil || *result.KnownUsage.InputTokens != 7 || result.KnownEstimatedCost != nil {
+		t.Fatalf("lost observed HTTP counts or invented cost: %+v", result)
 	}
 }

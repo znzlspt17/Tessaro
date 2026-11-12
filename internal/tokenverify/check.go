@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"jevcancode/internal/process"
 	"jevcancode/internal/tokenspec"
 	"jevcancode/internal/verify"
 	"os"
@@ -68,6 +69,9 @@ func literal(v any, typ string) (string, error) {
 	return "", fmt.Errorf("unsupported test value")
 }
 func harness(p tokenspec.Problem, b *Binding, tests []tokenspec.Test) (string, error) {
+	return makeHarness(p, b, tests, false)
+}
+func makeHarness(p tokenspec.Problem, b *Binding, tests []tokenspec.Test, counts bool) (string, error) {
 	if len(tests) == 0 {
 		return "", fmt.Errorf("tests required")
 	}
@@ -83,8 +87,19 @@ func harness(p tokenspec.Problem, b *Binding, tests []tokenspec.Test) (string, e
 	for osAlias == b.Name || osAlias == refAlias {
 		osAlias += "_"
 	}
+	fmtAlias := "_token_fmt"
+	for fmtAlias == b.Name || fmtAlias == refAlias || fmtAlias == osAlias {
+		fmtAlias += "_"
+	}
+	countName := "_token_passed"
+	for countName == b.Name || countName == fmtAlias || countName == refAlias || countName == osAlias {
+		countName += "_"
+	}
 	var src strings.Builder
-	fmt.Fprintf(&src, "package main\nimport (%s \"reflect\"; %s \"os\")\nfunc main(){\n", refAlias, osAlias)
+	fmt.Fprintf(&src, "package main\nimport (%s \"reflect\"; %s \"os\"; %s \"fmt\")\nfunc main(){\n_ = %s.Print\n", refAlias, osAlias, fmtAlias, fmtAlias)
+	if counts {
+		fmt.Fprintf(&src, "%s := 0; _ = %s.Exit\n", countName, osAlias)
+	}
 	for _, test := range tests {
 		if len(test.Inputs) != len(p.Inputs) {
 			return "", fmt.Errorf("input names mismatch")
@@ -104,7 +119,14 @@ func harness(p tokenspec.Problem, b *Binding, tests []tokenspec.Test) (string, e
 		if err != nil {
 			return "", err
 		}
-		fmt.Fprintf(&src, "if !%s.DeepEqual(%s(%s), %s) { %s.Exit(1) }\n", refAlias, b.Name, strings.Join(args, ","), want, osAlias)
+		if counts {
+			fmt.Fprintf(&src, "if %s.DeepEqual(%s(%s), %s) { %s++ }\n", refAlias, b.Name, strings.Join(args, ","), want, countName)
+		} else {
+			fmt.Fprintf(&src, "if !%s.DeepEqual(%s(%s), %s) { %s.Exit(1) }\n", refAlias, b.Name, strings.Join(args, ","), want, osAlias)
+		}
+	}
+	if counts {
+		fmt.Fprintf(&src, "%s.Print(%s)\n", fmtAlias, countName)
 	}
 	src.WriteString("}\n")
 	return src.String(), nil
@@ -134,7 +156,7 @@ func CheckObserved(ctx context.Context, p tokenspec.Problem, source string, test
 	if err != nil {
 		return false, timing, err
 	}
-	dir, err := os.MkdirTemp("", "jevcancoding-token-*")
+	dir, err := os.MkdirTemp("", "jevcancode-token-*")
 	if err != nil {
 		return false, timing, err
 	}
@@ -163,7 +185,7 @@ func CheckObserved(ctx context.Context, p tokenspec.Problem, source string, test
 	cmd.Stderr = io.Discard
 	started := time.Now()
 	notify("compile", "started")
-	err = cmd.Run()
+	err = process.RunContext(compileCtx, cmd)
 	timing.Compile = time.Since(started)
 	compileErr := compileCtx.Err()
 	cancel()
@@ -186,7 +208,7 @@ func CheckObserved(ctx context.Context, p tokenspec.Problem, source string, test
 	cmd.Stderr = io.Discard
 	started = time.Now()
 	notify("execute", "started")
-	err = cmd.Run()
+	err = process.RunContext(runCtx, cmd)
 	timing.Execute = time.Since(started)
 	runErr := runCtx.Err()
 	cancel()

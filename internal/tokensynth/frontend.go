@@ -35,12 +35,14 @@ type State struct {
 	declarationAccepted bool
 	declarationRejected tokenverify.DeclarationReason
 	header              *headerState
+	semantic            *semanticPrefix
 }
 type Choice struct {
 	Lexeme, Kind, Rule string
 	header             *headerState
 	check              tokenverify.DeclarationCheck
 	parent             *State
+	semantic           *semanticPrefix
 }
 type Rejection struct {
 	Choice Choice
@@ -48,6 +50,50 @@ type Rejection struct {
 }
 
 func (s *State) Source() string { return strings.Join(s.Tokens, " ") }
+
+// 2026-11-08: 문법의 가능한 모든 상위 문맥이 독립 문장 왼쪽일 때만 차단한다.
+// 괄호 등 다른 표현식에 포함될 수 있는 경우 문법 분석이 보수적으로 유지한다.
+func (s *State) irrecoverableExpression(next string) bool {
+	if s == nil || s.Parser == nil {
+		return false
+	}
+	tokens := s.Tokens
+	parserState := s.Parser
+	if next != "" {
+		tokens = append(append([]string(nil), tokens...), next)
+	}
+	if next != "" {
+		if !binaryOperator(next) && next != "!" {
+			return false
+		}
+		var err error
+		parserState, err = parserState.Advance(next)
+		if err != nil {
+			return false
+		}
+		if next == "!" {
+			return parserState.NotOnlyStatementLeft(len(tokens))
+		}
+		return parserState.BinaryOnlyStatementLeft(len(tokens), next)
+	}
+	for i := 0; i < len(tokens); i++ {
+		if tokens[i] == "!" && parserState.NotOnlyStatementLeft(i+1) {
+			return true
+		}
+		if binaryOperator(tokens[i]) && parserState.BinaryOnlyStatementLeft(i+1, tokens[i]) {
+			return true
+		}
+	}
+	return false
+}
+
+func binaryOperator(s string) bool {
+	switch s {
+	case "+", "-", "*", "/", "%", "<<", ">>", "&", "&^", "|", "^", "==", "!=", "<", "<=", ">", ">=", "&&", "||":
+		return true
+	}
+	return false
+}
 func NewState() (*State, error) {
 	g, e := Grammar()
 	if e != nil {
@@ -81,7 +127,7 @@ func (s *State) Advance(c Choice, id string) (*State, error) {
 			return nil, fmt.Errorf("declaration candidate rejected")
 		}
 	}
-	child := &State{ID: id, ParentID: s.ID, Tokens: append(append([]string(nil), s.Tokens...), c.Lexeme), Parser: next, Forced: s.Forced, Selected: s.Selected, parametersChecked: s.parametersChecked, declarationAccepted: s.declarationAccepted, declarationRejected: s.declarationRejected, header: header}
+	child := &State{ID: id, ParentID: s.ID, Tokens: append(append([]string(nil), s.Tokens...), c.Lexeme), Parser: next, Forced: s.Forced, Selected: s.Selected, parametersChecked: s.parametersChecked, declarationAccepted: s.declarationAccepted, declarationRejected: s.declarationRejected, header: header, semantic: c.semantic}
 	child.rememberDeclaration(c.check)
 	return child, nil
 }
@@ -334,12 +380,20 @@ func candidatesWithin(p tokenspec.Problem, s *State, limit int) ([]Choice, []Rej
 	if reason != "" {
 		return nil, []Rejection{{Reason: reason}}, false, nil
 	}
+	inputs, output, contractErr := p.Contract()
+	if contractErr != nil {
+		return nil, nil, false, contractErr
+	}
 	raw := rawNext(p, s)
 	allowed := make([]Choice, 0, len(raw))
 	var rejected []Rejection
 	for i, c := range raw {
 		if limit >= 0 && i >= limit {
 			return allowed, rejected, true, nil
+		}
+		if typedReturnMismatch(p, s, c.Lexeme, inputs, output) {
+			rejected = append(rejected, Rejection{Choice: c, Reason: tokenverify.DeclarationReason("return_type_mismatch")})
+			continue
 		}
 		next, reason, e := h.advance(c.Lexeme)
 		if e != nil {
@@ -348,6 +402,14 @@ func candidatesWithin(p tokenspec.Problem, s *State, limit int) ([]Choice, []Rej
 		if reason != "" {
 			rejected = append(rejected, Rejection{Choice: c, Reason: reason})
 			continue
+		}
+		if p.ReturnPolicy == tokenspec.ReturnPolicyValuesOnly {
+			tokens := append(append([]string(nil), s.Tokens...), c.Lexeme)
+			c.semantic = assessSemantic(p, tokens, s.semantic)
+			if c.semantic.assessment.Status == prefixImpossible {
+				rejected = append(rejected, Rejection{Choice: c, Reason: tokenverify.DeclarationReason(c.semantic.assessment.Reason)})
+				continue
+			}
 		}
 		check := tokenverify.DeclarationCheck{Status: tokenverify.DeclarationPending, ParametersChecked: s.parametersChecked}
 		if s.declarationAccepted {

@@ -18,12 +18,22 @@ import (
 
 // 2026-11-05: 토큰 합성의 공개 후보를 먼저 고정하고 보류 입력은 평가 단계에서만 읽는다.
 func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request) (out Result) {
+	defer out.sampleResources()
+	if q.ReturnPolicy != "" {
+		p.ReturnPolicy = q.ReturnPolicy
+	}
 	started := time.Now()
 	out.Engine = "token"
 	out.CandidateUnit = "go_lexical_token"
 	out.GrammarRevision = grammardata.Revision
 	out.Status = "execution_error"
 	out.Strategy = q.Strategy
+	out.ReturnPolicy = p.ReturnPolicy
+	out.ValidationMode = p.ValidationMode
+	out.Seed = q.Seed
+	if q.Strategy == "phs" {
+		out.Heuristic = "grammar_min_remaining_zero_fallback"
+	}
 	if out.Strategy == "" {
 		out.Strategy = "beam"
 		q.Strategy = "beam"
@@ -49,9 +59,24 @@ func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request
 			return
 		}
 	}
-	if q.Strategy != "beam" && q.Strategy != "greedy" && q.Strategy != "strict-greedy" {
+	if q.Strategy != "beam" && q.Strategy != "greedy" && q.Strategy != "strict-greedy" && q.Strategy != "lds" && q.Strategy != "levin" && q.Strategy != "phs" && q.Strategy != "mcts" {
 		out.Status = "input_error"
 		return
+	}
+	if q.DecisionBatchSize < 0 || q.DecisionBatchSize > 256 || (q.DecisionBatchSize > 1 && q.Strategy != "lds" && q.Strategy != "levin" && q.Strategy != "phs") {
+		out.Status = "input_error"
+		return
+	}
+	if q.DecisionBatchSize == 0 {
+		q.DecisionBatchSize = 1
+	}
+	out.DecisionBatchSize = q.DecisionBatchSize
+	out.DecisionMode = "parent_local_single"
+	if q.Strategy == "beam" || q.Strategy == "greedy" || q.Strategy == "strict-greedy" {
+		out.DecisionMode = "legacy_joint"
+	}
+	if q.DecisionBatchSize > 1 {
+		out.DecisionMode = "parent_local_batch_prefetch"
 	}
 	b := p.Budgets
 	if q.MaxTokens == 0 {
@@ -114,22 +139,31 @@ func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request
 	ctx, cancel := context.WithTimeout(ctx, q.Timeout)
 	defer cancel()
 	m := &measuredRanker{Ranker: r, inputKnown: true, outputKnown: true}
+	if q.DecisionBatchSize > 1 && !m.SupportsDecisionBatch() {
+		out.DecisionMode = "parent_local_sequential_fallback"
+	}
+	var requestCounter rank.HTTPRequestCounter
+	var initialRequests int64
+	if counter, ok := r.(rank.HTTPRequestCounter); ok {
+		requestCounter = counter
+		initialRequests = counter.HTTPRequests()
+	}
 	defer func() {
+		if requestCounter != nil {
+			count := requestCounter.HTTPRequests() - initialRequests
+			out.HTTPRequests = &count
+		}
 		out.PhaseMS["rank"] = float64(m.elapsed) / float64(time.Millisecond)
-		out.Usage = m.usage()
+		out.recordUsage(m, q.InputPrice, q.OutputPrice)
 		if provider, ok := r.(rank.MetadataProvider); ok {
 			out.Ranker = provider.Metadata()
-		}
-		if out.Usage != nil && out.Usage.InputTokens != nil && out.Usage.OutputTokens != nil && q.InputPrice != nil && q.OutputPrice != nil {
-			cost := (float64(*out.Usage.InputTokens)**q.InputPrice + float64(*out.Usage.OutputTokens)**q.OutputPrice) / 1e6
-			out.EstimatedCost = &cost
 		}
 	}()
 	var trace func(tokensynth.Event)
 	verificationID := "verification"
 	if q.TokenTrace != nil {
 		trace = func(e tokensynth.Event) {
-			if e.Reason == "decision_context" && !q.TraceCode && !q.TraceDecisionContext {
+			if (e.Reason == "decision_context" || e.Reason == "prefetch_context") && !q.TraceCode && !q.TraceDecisionContext {
 				return
 			}
 			if e.Reason == "validation_started" {
@@ -153,7 +187,23 @@ func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request
 	}
 	var selected *tokenverify.Binding
 	searchStart := time.Now()
-	s, err := tokensynth.Search(ctx, p, m, tokensynth.Options{Strategy: q.Strategy, MaxTokens: q.MaxTokens, MaxCalls: q.MaxCalls, MaxCandidates: q.MaxCandidates, Trace: trace, TraceCode: q.TraceCode}, func(source string) (bool, error) {
+	s, err := tokensynth.Search(ctx, p, m, tokensynth.Options{Strategy: q.Strategy, Seed: q.Seed, DecisionBatchSize: q.DecisionBatchSize, MaxTokens: q.MaxTokens, MaxCalls: q.MaxCalls, MaxCandidates: q.MaxCandidates, Trace: trace, TraceCode: q.TraceCode, PublicEvaluate: func(ctx context.Context, source string) (tokenverify.PublicEvaluation, error) {
+		t := time.Now()
+		evaluation, err := tokenverify.EvaluatePublic(ctx, p, source, p.PublicTests)
+		out.PhaseMS["public_verify"] += float64(time.Since(t)) / float64(time.Millisecond)
+		out.PhaseMS["compile"] += float64(evaluation.Timing.Compile) / float64(time.Millisecond)
+		out.PhaseMS["public_execute"] += float64(evaluation.Timing.Execute) / float64(time.Millisecond)
+		if evaluation.Status == "typecheck_failed" {
+			out.TypecheckFailures++
+		}
+		if evaluation.Timing.Compile > 0 {
+			out.CompileAttempts++
+		}
+		if evaluation.Timing.Compiled {
+			out.CompilePasses++
+		}
+		return evaluation, err
+	}}, func(source string) (bool, error) {
 		t := time.Now()
 		phase("typecheck", "started")
 		binding, e := tokenverify.Validate(p, source)
@@ -197,6 +247,11 @@ func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request
 	}
 	out.Candidates = s.Candidates
 	out.Calls = s.Calls
+	out.Questions = m.calls
+	out.Expansions = s.Expansions
+	out.MemoHits = s.MemoHits
+	out.EvaluationMemoHits = s.EvaluationMemoHits
+	out.Validations = s.Validations
 	out.CompileFailures = out.CompileAttempts - out.CompilePasses
 	out.TokenCount = len(s.Tokens)
 	out.GeneratedTokens = s.GeneratedTokens
@@ -207,7 +262,13 @@ func RunToken(ctx context.Context, p tokenspec.Problem, r rank.Ranker, q Request
 	out.EmittedTokens = append([]string(nil), s.Tokens...)
 	if err != nil {
 		var modelErr modelFailure
+		var coded interface{ ErrorCode() string }
+		if errors.As(err, &coded) {
+			out.ErrorCode = coded.ErrorCode()
+		}
 		switch {
+		case out.ErrorCode == "question_budget_exhausted":
+			out.Status = "budget_exhausted"
 		case errors.Is(err, tokensynth.ErrBudget):
 			out.Status = "budget_exhausted"
 		case errors.Is(err, tokensynth.ErrCandidateLimit):

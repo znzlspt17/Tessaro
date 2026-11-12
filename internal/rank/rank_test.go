@@ -24,3 +24,15 @@ func TestOrderUsesStableIDTieBreak(t *testing.T) {
 		t.Fatalf("%v %v", out, err)
 	}
 }
+
+func TestNormalizedCategoricalCapability(t *testing.T) {
+	for _, r := range []Ranker{&HTTP{}, NewWorker(WorkerConfig{})} {
+		capability, ok := r.(interface{ NormalizedCategorical() bool })
+		if !ok || !capability.NormalizedCategorical() {
+			t.Fatalf("%T does not declare categorical distribution", r)
+		}
+	}
+	if capability, ok := any(Fake{}).(interface{ NormalizedCategorical() bool }); ok && capability.NormalizedCategorical() {
+		t.Fatal("fake arbitrary ranks declared probabilities")
+	}
+}

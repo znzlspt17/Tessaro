@@ -8,6 +8,8 @@ import (
 	"jevcancode/internal/rank"
 	"jevcancode/internal/tokenlex"
 	"jevcancode/internal/tokenverify"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
@@ -400,6 +402,30 @@ func TestDecisionContextMatchesRankInput(t *testing.T) {
 	}}, func(string) (bool, error) { return false, nil })
 	var want map[string]any
 	_ = json.Unmarshal([]byte(got), &want)
+	if observed == nil || observed["state_json"] != got || observed["schema_version"] != "decision-context-v1" || observed["transport"] != "single" {
+		t.Fatalf("trace state or schema mismatch: %+v", observed)
+	}
+	var candidates []rank.Candidate
+	_, _ = Search(context.Background(), p, candidateRecorder{fn: func(cs []rank.Candidate) { candidates = append([]rank.Candidate(nil), cs...) }}, Options{Strategy: "beam"}, func(string) (bool, error) { return false, nil })
+	instructions, criteria, err := rank.ChoiceQuestion(candidates)
+	if err != nil {
+		t.Fatal(err)
+	}
+	criteriaJSON, _ := json.Marshal(criteria)
+	var comparableCriteria any
+	_ = json.Unmarshal(criteriaJSON, &comparableCriteria)
+	candidatesJSON, _ := json.Marshal(candidates)
+	var comparableCandidates any
+	_ = json.Unmarshal(candidatesJSON, &comparableCandidates)
+	if observed["instructions"] != instructions || !reflect.DeepEqual(observed["criteria"], comparableCriteria) || !reflect.DeepEqual(observed["ordered_candidates"], comparableCandidates) {
+		t.Fatalf("decision question differs from rank input: %+v", observed)
+	}
+	delete(observed, "instructions")
+	delete(observed, "criteria")
+	delete(observed, "state_json")
+	delete(observed, "schema_version")
+	delete(observed, "transport")
+	delete(observed, "ordered_candidates")
 	if observed == nil || !reflect.DeepEqual(observed, want) {
 		t.Fatalf("decision context does not match rank input: got=%v want=%v", observed, want)
 	}
@@ -441,7 +467,7 @@ func TestBodyStartAndExpressionCandidates(t *testing.T) {
 
 func TestBodyGateFiltersBeforeRanking(t *testing.T) {
 	p := subtractionSpec(t)
-	s := advanceContract(t, p, strings.Fields("package main ; func f0 ( a int , b int ) int { a + b"))
+	s := advanceContract(t, p, strings.Fields("package main ; func f0 ( a int , b int ) int { a"))
 	var offered []rank.Candidate
 	var rejected bool
 	r := candidateRecorder{fn: func(cs []rank.Candidate) { offered = append([]rank.Candidate(nil), cs...) }}
@@ -488,5 +514,79 @@ func TestBodyGateDoesNotCloseCompositeLiteral(t *testing.T) {
 	tokens := strings.Fields("package main ; func f0 ( a int , b int ) int { a + [ ] int {")
 	if reason := tokenverify.CheckBodyPrefix(p, tokens); reason != "" {
 		t.Fatalf("unfinished composite literal must remain pending: %s", reason)
+	}
+}
+
+func TestNonCallableCandidateRejectedBeforeRank(t *testing.T) {
+	p := subtractionSpec(t)
+	for _, body := range []string{"return a", "return ( a )", "return ( a", "return ( int ( a ) + ( a", "v0 := a ; return v0", "if a > b { v0 := a ; return v0"} {
+		t.Run(body, func(t *testing.T) {
+			s := advanceContract(t, p, strings.Fields("package main ; func f0 ( a int , b int ) int { "+body))
+			var offered []rank.Candidate
+			rejected := false
+			_, _ = searchFrom(context.Background(), p, candidateRecorder{fn: func(cs []rank.Candidate) { offered = append([]rank.Candidate(nil), cs...) }}, Options{Strategy: "beam", Trace: func(e Event) {
+				if e.Reason == "body_rejected" && e.Lexeme == "(" && e.RejectionReason == "non_callable" {
+					rejected = true
+				}
+			}}, func(string) (bool, error) { return false, nil }, []*State{s})
+			for _, c := range offered {
+				if c.Lexeme == "(" {
+					t.Fatal("non-callable identifier offered to ranker")
+				}
+			}
+			if !rejected {
+				t.Fatal("missing non-callable rejection")
+			}
+		})
+	}
+}
+
+func TestNonCallableGateRespectsBuiltinShadowing(t *testing.T) {
+	p := subtractionSpec(t)
+	for _, source := range []string{
+		"package main ; func f0 ( len int , b int ) int { return len (",
+		"package main ; func f0 ( a int , b int ) int { len := a ; return len (",
+	} {
+		if reason := tokenverify.CheckBodyPrefix(p, strings.Fields(source)); reason != "non_callable" {
+			t.Errorf("shadowed built-in call was not rejected: %q: %s", source, reason)
+		}
+	}
+}
+
+func TestNonCallableGatePreservesValidAndUnknownPrefixes(t *testing.T) {
+	p := subtractionSpec(t)
+	for _, body := range []string{
+		"return a + (", "return int (", "return len (",
+		"v0 := 1 ; for v0 <= a { v0 *= a ; a -- ; } ; return v0 + (",
+		"if a > b { v0 := a ; } ; return v0 (",
+	} {
+		t.Run(body, func(t *testing.T) {
+			tokens := strings.Fields("package main ; func f0 ( a int , b int ) int { " + body)
+			if reason := tokenverify.CheckBodyPrefix(p, tokens); reason != "" {
+				t.Fatalf("valid or unresolved prefix rejected: %s", reason)
+			}
+		})
+	}
+}
+
+func TestDecisionTraceMatchesActualChoiceRequest(t *testing.T) {
+	p := subtractionSpec(t)
+	var request map[string]any
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewDecoder(r.Body).Decode(&request)
+		w.WriteHeader(http.StatusBadRequest)
+	}))
+	defer srv.Close()
+	var trace map[string]any
+	_, _ = Search(context.Background(), p, &rank.HTTP{URL: srv.URL, Model: "test"}, Options{Strategy: "beam", Trace: func(e Event) {
+		if e.Reason == "decision_context" {
+			b, _ := json.Marshal(e.DecisionContext)
+			_ = json.Unmarshal(b, &trace)
+		}
+	}}, func(string) (bool, error) { return false, nil })
+	questions, _ := request["questions"].(map[string]any)
+	pick, _ := questions["pick"].(map[string]any)
+	if pick == nil || trace["instructions"] == nil || !reflect.DeepEqual(trace["instructions"], pick["instructions"]) || !reflect.DeepEqual(trace["criteria"], pick["criteria"]) {
+		t.Fatalf("trace does not match actual request: trace=%v pick=%v", trace, pick)
 	}
 }
