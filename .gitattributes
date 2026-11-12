@@ -1,0 +1,4 @@
+/examples/**/*.json text eol=lf
+/third_party/tree-sitter-go/grammar.json text eol=lf
+/third_party/tree-sitter-go/node-types.json text eol=lf
+/third_party/tree-sitter-go/LICENSE text eol=lf
