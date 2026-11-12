@@ -1,0 +1,319 @@
+{
+  "engine": "token",
+  "models": [
+    {
+      "id": "jev",
+      "ranker": "jev",
+      "model": "jev-1.14.0",
+      "key_env": "TYPESAFE_API_KEY"
+    }
+  ],
+  "problems": [
+    {
+      "id": "arithmetic-add",
+      "spec": "dev/specs/arithmetic-add.json",
+      "heldout": "dev/heldout/arithmetic-add.json"
+    },
+    {
+      "id": "arithmetic-subtract",
+      "spec": "dev/specs/arithmetic-subtract.json",
+      "heldout": "dev/heldout/arithmetic-subtract.json"
+    },
+    {
+      "id": "arithmetic-multiply",
+      "spec": "dev/specs/arithmetic-multiply.json",
+      "heldout": "dev/heldout/arithmetic-multiply.json"
+    },
+    {
+      "id": "arithmetic-quotient",
+      "spec": "dev/specs/arithmetic-quotient.json",
+      "heldout": "dev/heldout/arithmetic-quotient.json"
+    },
+    {
+      "id": "comparison-less",
+      "spec": "dev/specs/comparison-less.json",
+      "heldout": "dev/heldout/comparison-less.json"
+    },
+    {
+      "id": "comparison-greater",
+      "spec": "dev/specs/comparison-greater.json",
+      "heldout": "dev/heldout/comparison-greater.json"
+    },
+    {
+      "id": "comparison-equal",
+      "spec": "dev/specs/comparison-equal.json",
+      "heldout": "dev/heldout/comparison-equal.json"
+    },
+    {
+      "id": "comparison-nonnegative",
+      "spec": "dev/specs/comparison-nonnegative.json",
+      "heldout": "dev/heldout/comparison-nonnegative.json"
+    },
+    {
+      "id": "boolean-not",
+      "spec": "dev/specs/boolean-not.json"
+    },
+    {
+      "id": "boolean-and",
+      "spec": "dev/specs/boolean-and.json"
+    },
+    {
+      "id": "boolean-or",
+      "spec": "dev/specs/boolean-or.json"
+    },
+    {
+      "id": "boolean-xor",
+      "spec": "dev/specs/boolean-xor.json"
+    },
+    {
+      "id": "conditional-abs",
+      "spec": "dev/specs/conditional-abs.json",
+      "heldout": "dev/heldout/conditional-abs.json"
+    },
+    {
+      "id": "conditional-max",
+      "spec": "dev/specs/conditional-max.json",
+      "heldout": "dev/heldout/conditional-max.json"
+    },
+    {
+      "id": "conditional-min",
+      "spec": "dev/specs/conditional-min.json",
+      "heldout": "dev/heldout/conditional-min.json"
+    },
+    {
+      "id": "conditional-clamp",
+      "spec": "dev/specs/conditional-clamp.json",
+      "heldout": "dev/heldout/conditional-clamp.json"
+    },
+    {
+      "id": "composition-affine",
+      "spec": "dev/specs/composition-affine.json",
+      "heldout": "dev/heldout/composition-affine.json"
+    },
+    {
+      "id": "composition-square-plus",
+      "spec": "dev/specs/composition-square-plus.json",
+      "heldout": "dev/heldout/composition-square-plus.json"
+    },
+    {
+      "id": "composition-sum-three",
+      "spec": "dev/specs/composition-sum-three.json",
+      "heldout": "dev/heldout/composition-sum-three.json"
+    },
+    {
+      "id": "composition-difference-product",
+      "spec": "dev/specs/composition-difference-product.json",
+      "heldout": "dev/heldout/composition-difference-product.json"
+    },
+    {
+      "id": "scope-branch-local",
+      "spec": "dev/specs/scope-branch-local.json",
+      "heldout": "dev/heldout/scope-branch-local.json"
+    },
+    {
+      "id": "scope-conditional-update",
+      "spec": "dev/specs/scope-conditional-update.json",
+      "heldout": "dev/heldout/scope-conditional-update.json"
+    },
+    {
+      "id": "scope-two-locals",
+      "spec": "dev/specs/scope-two-locals.json",
+      "heldout": "dev/heldout/scope-two-locals.json"
+    },
+    {
+      "id": "scope-boolean-update",
+      "spec": "dev/specs/scope-boolean-update.json"
+    },
+    {
+      "id": "string-length",
+      "spec": "dev/specs/string-length.json",
+      "heldout": "dev/heldout/string-length.json"
+    },
+    {
+      "id": "string-first-byte",
+      "spec": "dev/specs/string-first-byte.json",
+      "heldout": "dev/heldout/string-first-byte.json"
+    },
+    {
+      "id": "string-concat",
+      "spec": "dev/specs/string-concat.json",
+      "heldout": "dev/heldout/string-concat.json"
+    },
+    {
+      "id": "string-equal",
+      "spec": "dev/specs/string-equal.json",
+      "heldout": "dev/heldout/string-equal.json"
+    },
+    {
+      "id": "slice-sum",
+      "spec": "dev/specs/slice-sum.json",
+      "heldout": "dev/heldout/slice-sum.json"
+    },
+    {
+      "id": "slice-positive-count",
+      "spec": "dev/specs/slice-positive-count.json",
+      "heldout": "dev/heldout/slice-positive-count.json"
+    },
+    {
+      "id": "slice-string-count",
+      "spec": "dev/specs/slice-string-count.json",
+      "heldout": "dev/heldout/slice-string-count.json"
+    },
+    {
+      "id": "slice-reverse",
+      "spec": "dev/specs/slice-reverse.json",
+      "heldout": "dev/heldout/slice-reverse.json"
+    },
+    {
+      "id": "map-int-lookup",
+      "spec": "dev/specs/map-int-lookup.json",
+      "heldout": "dev/heldout/map-int-lookup.json"
+    },
+    {
+      "id": "map-int-sum",
+      "spec": "dev/specs/map-int-sum.json",
+      "heldout": "dev/heldout/map-int-sum.json"
+    },
+    {
+      "id": "map-string-lookup",
+      "spec": "dev/specs/map-string-lookup.json",
+      "heldout": "dev/heldout/map-string-lookup.json"
+    },
+    {
+      "id": "map-remove-zero",
+      "spec": "dev/specs/map-remove-zero.json",
+      "heldout": "dev/heldout/map-remove-zero.json"
+    },
+    {
+      "id": "identity",
+      "spec": "dev/specs/identity.json",
+      "heldout": "dev/heldout/identity.json"
+    },
+    {
+      "id": "loop-factorial",
+      "spec": "dev/specs/loop-factorial.json",
+      "heldout": "dev/heldout/loop-factorial.json"
+    },
+    {
+      "id": "loop-sum-to-n",
+      "spec": "dev/specs/loop-sum-to-n.json",
+      "heldout": "dev/heldout/loop-sum-to-n.json"
+    },
+    {
+      "id": "loop-count-even",
+      "spec": "dev/specs/loop-count-even.json",
+      "heldout": "dev/heldout/loop-count-even.json"
+    },
+    {
+      "id": "eval-arith-double-sum",
+      "spec": "eval/specs/eval-arith-double-sum.json",
+      "heldout": "eval/heldout/eval-arith-double-sum.json"
+    },
+    {
+      "id": "eval-arith-reverse-diff",
+      "spec": "eval/specs/eval-arith-reverse-diff.json",
+      "heldout": "eval/heldout/eval-arith-reverse-diff.json"
+    },
+    {
+      "id": "eval-arith-square-minus",
+      "spec": "eval/specs/eval-arith-square-minus.json",
+      "heldout": "eval/heldout/eval-arith-square-minus.json"
+    },
+    {
+      "id": "eval-arith-less-equal",
+      "spec": "eval/specs/eval-arith-less-equal.json",
+      "heldout": "eval/heldout/eval-arith-less-equal.json"
+    },
+    {
+      "id": "eval-branch-positive",
+      "spec": "eval/specs/eval-branch-positive.json",
+      "heldout": "eval/heldout/eval-branch-positive.json"
+    },
+    {
+      "id": "eval-branch-negative",
+      "spec": "eval/specs/eval-branch-negative.json",
+      "heldout": "eval/heldout/eval-branch-negative.json"
+    },
+    {
+      "id": "eval-branch-sign-flip",
+      "spec": "eval/specs/eval-branch-sign-flip.json",
+      "heldout": "eval/heldout/eval-branch-sign-flip.json"
+    },
+    {
+      "id": "eval-branch-nonzero",
+      "spec": "eval/specs/eval-branch-nonzero.json",
+      "heldout": "eval/heldout/eval-branch-nonzero.json"
+    },
+    {
+      "id": "eval-string-len-plus",
+      "spec": "eval/specs/eval-string-len-plus.json",
+      "heldout": "eval/heldout/eval-string-len-plus.json"
+    },
+    {
+      "id": "eval-string-reverse-concat",
+      "spec": "eval/specs/eval-string-reverse-concat.json",
+      "heldout": "eval/heldout/eval-string-reverse-concat.json"
+    },
+    {
+      "id": "eval-string-nonempty",
+      "spec": "eval/specs/eval-string-nonempty.json",
+      "heldout": "eval/heldout/eval-string-nonempty.json"
+    },
+    {
+      "id": "eval-string-longer",
+      "spec": "eval/specs/eval-string-longer.json",
+      "heldout": "eval/heldout/eval-string-longer.json"
+    },
+    {
+      "id": "eval-slice-count-zero",
+      "spec": "eval/specs/eval-slice-count-zero.json",
+      "heldout": "eval/heldout/eval-slice-count-zero.json"
+    },
+    {
+      "id": "eval-slice-negative-sum",
+      "spec": "eval/specs/eval-slice-negative-sum.json",
+      "heldout": "eval/heldout/eval-slice-negative-sum.json"
+    },
+    {
+      "id": "eval-slice-first-or-zero",
+      "spec": "eval/specs/eval-slice-first-or-zero.json",
+      "heldout": "eval/heldout/eval-slice-first-or-zero.json"
+    },
+    {
+      "id": "eval-slice-length-plus",
+      "spec": "eval/specs/eval-slice-length-plus.json",
+      "heldout": "eval/heldout/eval-slice-length-plus.json"
+    },
+    {
+      "id": "eval-map-size",
+      "spec": "eval/specs/eval-map-size.json",
+      "heldout": "eval/heldout/eval-map-size.json"
+    },
+    {
+      "id": "eval-map-positive-count",
+      "spec": "eval/specs/eval-map-positive-count.json",
+      "heldout": "eval/heldout/eval-map-positive-count.json"
+    },
+    {
+      "id": "eval-map-negative-sum",
+      "spec": "eval/specs/eval-map-negative-sum.json",
+      "heldout": "eval/heldout/eval-map-negative-sum.json"
+    },
+    {
+      "id": "eval-map-sum-plus",
+      "spec": "eval/specs/eval-map-sum-plus.json",
+      "heldout": "eval/heldout/eval-map-sum-plus.json"
+    }
+  ],
+  "strategies": [
+    "strict-greedy",
+    "beam",
+    "lds",
+    "levin",
+    "phs",
+    "mcts"
+  ],
+  "repeats": 3,
+  "seed": 42,
+  "ordering": "paired-cross-over-v1"
+}

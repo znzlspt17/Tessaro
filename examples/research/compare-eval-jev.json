@@ -1,0 +1,124 @@
+{
+  "engine": "token",
+  "models": [
+    {
+      "id": "jev",
+      "ranker": "jev",
+      "model": "jev-1.14.0",
+      "key_env": "TYPESAFE_API_KEY"
+    }
+  ],
+  "problems": [
+    {
+      "id": "eval-arith-double-sum",
+      "spec": "eval/specs/eval-arith-double-sum.json",
+      "heldout": "eval/heldout/eval-arith-double-sum.json"
+    },
+    {
+      "id": "eval-arith-reverse-diff",
+      "spec": "eval/specs/eval-arith-reverse-diff.json",
+      "heldout": "eval/heldout/eval-arith-reverse-diff.json"
+    },
+    {
+      "id": "eval-arith-square-minus",
+      "spec": "eval/specs/eval-arith-square-minus.json",
+      "heldout": "eval/heldout/eval-arith-square-minus.json"
+    },
+    {
+      "id": "eval-arith-less-equal",
+      "spec": "eval/specs/eval-arith-less-equal.json",
+      "heldout": "eval/heldout/eval-arith-less-equal.json"
+    },
+    {
+      "id": "eval-branch-positive",
+      "spec": "eval/specs/eval-branch-positive.json",
+      "heldout": "eval/heldout/eval-branch-positive.json"
+    },
+    {
+      "id": "eval-branch-negative",
+      "spec": "eval/specs/eval-branch-negative.json",
+      "heldout": "eval/heldout/eval-branch-negative.json"
+    },
+    {
+      "id": "eval-branch-sign-flip",
+      "spec": "eval/specs/eval-branch-sign-flip.json",
+      "heldout": "eval/heldout/eval-branch-sign-flip.json"
+    },
+    {
+      "id": "eval-branch-nonzero",
+      "spec": "eval/specs/eval-branch-nonzero.json",
+      "heldout": "eval/heldout/eval-branch-nonzero.json"
+    },
+    {
+      "id": "eval-string-len-plus",
+      "spec": "eval/specs/eval-string-len-plus.json",
+      "heldout": "eval/heldout/eval-string-len-plus.json"
+    },
+    {
+      "id": "eval-string-reverse-concat",
+      "spec": "eval/specs/eval-string-reverse-concat.json",
+      "heldout": "eval/heldout/eval-string-reverse-concat.json"
+    },
+    {
+      "id": "eval-string-nonempty",
+      "spec": "eval/specs/eval-string-nonempty.json",
+      "heldout": "eval/heldout/eval-string-nonempty.json"
+    },
+    {
+      "id": "eval-string-longer",
+      "spec": "eval/specs/eval-string-longer.json",
+      "heldout": "eval/heldout/eval-string-longer.json"
+    },
+    {
+      "id": "eval-slice-count-zero",
+      "spec": "eval/specs/eval-slice-count-zero.json",
+      "heldout": "eval/heldout/eval-slice-count-zero.json"
+    },
+    {
+      "id": "eval-slice-negative-sum",
+      "spec": "eval/specs/eval-slice-negative-sum.json",
+      "heldout": "eval/heldout/eval-slice-negative-sum.json"
+    },
+    {
+      "id": "eval-slice-first-or-zero",
+      "spec": "eval/specs/eval-slice-first-or-zero.json",
+      "heldout": "eval/heldout/eval-slice-first-or-zero.json"
+    },
+    {
+      "id": "eval-slice-length-plus",
+      "spec": "eval/specs/eval-slice-length-plus.json",
+      "heldout": "eval/heldout/eval-slice-length-plus.json"
+    },
+    {
+      "id": "eval-map-size",
+      "spec": "eval/specs/eval-map-size.json",
+      "heldout": "eval/heldout/eval-map-size.json"
+    },
+    {
+      "id": "eval-map-positive-count",
+      "spec": "eval/specs/eval-map-positive-count.json",
+      "heldout": "eval/heldout/eval-map-positive-count.json"
+    },
+    {
+      "id": "eval-map-negative-sum",
+      "spec": "eval/specs/eval-map-negative-sum.json",
+      "heldout": "eval/heldout/eval-map-negative-sum.json"
+    },
+    {
+      "id": "eval-map-sum-plus",
+      "spec": "eval/specs/eval-map-sum-plus.json",
+      "heldout": "eval/heldout/eval-map-sum-plus.json"
+    }
+  ],
+  "strategies": [
+    "strict-greedy",
+    "beam",
+    "lds",
+    "levin",
+    "phs",
+    "mcts"
+  ],
+  "repeats": 3,
+  "seed": 42,
+  "ordering": "paired-cross-over-v1"
+}
