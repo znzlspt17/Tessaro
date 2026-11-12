@@ -1,7 +1,7 @@
 package researchdata
 
 import (
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"strings"
 	"testing"
 )

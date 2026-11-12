@@ -4,7 +4,7 @@ package main
 
 import (
 	"errors"
-	"jevcancode/internal/desktop"
+	"tessaro/internal/desktop"
 	"testing"
 )
 

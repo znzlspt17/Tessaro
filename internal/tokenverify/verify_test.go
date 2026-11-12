@@ -3,8 +3,8 @@ package tokenverify
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/verify"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/verify"
 	"strings"
 	"testing"
 )

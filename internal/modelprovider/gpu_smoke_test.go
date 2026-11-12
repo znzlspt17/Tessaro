@@ -8,15 +8,15 @@ import (
 	"testing"
 	"time"
 
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/runner"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
+	"tessaro/internal/runner"
 )
 
 // 2026-11-07: 평소 테스트는 GPU를 로드하지 않고 명시한 실측 실행에서만 실제 워커 복구를 확인한다.
 func TestActualDeciderSmoke(t *testing.T) {
-	if os.Getenv("JEVCANCODE_GPU_SMOKE") != "1" {
+	if os.Getenv("TESSARO_GPU_SMOKE") != "1" {
 		t.Skip("explicit GPU smoke only")
 	}
 	root, err := filepath.Abs("../..")

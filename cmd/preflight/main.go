@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"jevcancode/internal/researchdata"
+	"tessaro/internal/researchdata"
 	"os"
 )
 

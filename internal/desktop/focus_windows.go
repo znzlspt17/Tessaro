@@ -5,7 +5,7 @@ package desktop
 import (
 	"github.com/lxn/walk"
 	"github.com/lxn/win"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"unicode/utf16"
 	"unsafe"
 )

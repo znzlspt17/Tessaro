@@ -2,8 +2,8 @@ package tokensynth
 
 import (
 	"context"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/rank"
+	"tessaro/internal/tokenspec"
 
 	"testing"
 )

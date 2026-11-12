@@ -2,8 +2,8 @@ package runner
 
 import (
 	"context"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/tokensynth"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/tokensynth"
 	"strings"
 	"testing"
 )

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"go/scanner"
 	"go/token"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/tokensynth"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/tokensynth"
 	"strings"
 )
 

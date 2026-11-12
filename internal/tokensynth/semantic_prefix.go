@@ -6,8 +6,8 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
-	"jevcancode/internal/tokenlex"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenlex"
+	"tessaro/internal/tokenspec"
 	"strings"
 )
 

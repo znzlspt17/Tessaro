@@ -9,7 +9,7 @@
 ```powershell
 go test ./internal/tokenverify -run TestTokenDatasetReferences -count=1
 go test ./internal/tokensynth -run TestDatasetReferenceFrontiers -count=1
-# 실제 모델 비교는 JevCanCode의 비교 탭에서 compare-live.json을 엽니다.
+# 실제 모델 비교는 Tessaro의 비교 탭에서 compare-live.json을 엽니다.
 ```
 
 설정 파일 경로는 설정이 있는 디렉터리를 기준으로 해석합니다.

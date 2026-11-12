@@ -2,7 +2,7 @@ package tokensynth
 
 import (
 	"fmt"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"strings"
 	"testing"
 )

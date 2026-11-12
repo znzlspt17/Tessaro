@@ -3,7 +3,7 @@ package hypothesis
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 	"testing"
 )
 

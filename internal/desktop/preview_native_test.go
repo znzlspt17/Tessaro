@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/lxn/walk"
 	"github.com/lxn/win"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"runtime"
 	"strings"
 	"testing"

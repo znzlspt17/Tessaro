@@ -2,9 +2,9 @@ package desktop
 
 import (
 	"encoding/json"
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/runner"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
+	"tessaro/internal/runner"
 	"strings"
 	"testing"
 )

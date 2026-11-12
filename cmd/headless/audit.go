@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"math"
 	"math/rand"
 	"os"
@@ -17,9 +17,9 @@ import (
 	"sort"
 	"strings"
 
-	"jevcancode/internal/compare"
-	"jevcancode/internal/modelprovider"
-	"jevcancode/internal/rank"
+	"tessaro/internal/compare"
+	"tessaro/internal/modelprovider"
+	"tessaro/internal/rank"
 )
 
 type auditObservation struct {

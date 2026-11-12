@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"jevcancode/internal/process"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/verify"
+	"tessaro/internal/process"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/verify"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -156,7 +156,7 @@ func CheckObserved(ctx context.Context, p tokenspec.Problem, source string, test
 	if err != nil {
 		return false, timing, err
 	}
-	dir, err := os.MkdirTemp("", "jevcancode-token-*")
+	dir, err := os.MkdirTemp("", "tessaro-token-*")
 	if err != nil {
 		return false, timing, err
 	}

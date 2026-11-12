@@ -3,8 +3,8 @@ package modelprovider
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
 	"net/url"
 	"strings"
 	"sync"

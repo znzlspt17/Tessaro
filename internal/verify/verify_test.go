@@ -2,7 +2,7 @@ package verify
 
 import (
 	"context"
-	"jevcancode/internal/spec"
+	"tessaro/internal/spec"
 	"testing"
 	"time"
 )

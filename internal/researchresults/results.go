@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"jevcancode/internal/compare"
+	"tessaro/internal/compare"
 	"os"
 	"path/filepath"
 	"reflect"

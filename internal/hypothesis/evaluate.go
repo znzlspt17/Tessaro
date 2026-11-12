@@ -2,7 +2,7 @@ package hypothesis
 
 import (
 	"context"
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 )
 
 type BResult struct {

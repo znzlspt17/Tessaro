@@ -2,9 +2,9 @@ package runner
 
 import (
 	"context"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/spec"
-	"jevcancode/internal/verify"
+	"tessaro/internal/rank"
+	"tessaro/internal/spec"
+	"tessaro/internal/verify"
 	"strings"
 	"testing"
 )

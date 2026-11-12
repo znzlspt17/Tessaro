@@ -3,8 +3,8 @@ package tokensynth
 import (
 	"context"
 	"encoding/json"
-	"jevcancode/internal/grammar"
-	"jevcancode/internal/rank"
+	"tessaro/internal/grammar"
+	"tessaro/internal/rank"
 	"reflect"
 	"strings"
 	"testing"

@@ -15,11 +15,11 @@ import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 	"github.com/lxn/win"
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/modelprovider"
-	"jevcancode/internal/runner"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
+	"tessaro/internal/modelprovider"
+	"tessaro/internal/runner"
+	"tessaro/internal/tokenspec"
 )
 
 type window struct {
@@ -137,7 +137,7 @@ func newWindow(settings desktopSettings) (*window, error) {
 	w.provider = modelprovider.New(modelprovider.Config{Python: settings.Python, Script: settings.Script, ModelDir: settings.ModelDir})
 	var err error
 	w.manager = application.New(application.Config{OutputDir: settings.Output, Resolve: w.provider.Resolve})
-	err = MainWindow{AssignTo: &w.mw, Title: "JevCanCode", Font: Font{Family: "맑은 고딕", PointSize: 10}, MinSize: Size{Width: 900, Height: 650}, Size: Size{Width: 1320, Height: 850}, Layout: VBox{}, Children: []Widget{
+	err = MainWindow{AssignTo: &w.mw, Title: "Tessaro", Font: Font{Family: "맑은 고딕", PointSize: 10}, MinSize: Size{Width: 900, Height: 650}, Size: Size{Width: 1320, Height: 850}, Layout: VBox{}, Children: []Widget{
 		TabWidget{AssignTo: &w.mainTabs, Pages: []TabPage{
 			w.searchPage(),
 			w.researchPage(settings.Project),
@@ -171,7 +171,7 @@ func settingsPath() string {
 	if e != nil {
 		return ""
 	}
-	return filepath.Join(d, "JevCanCode", "settings.json")
+	return filepath.Join(d, "Tessaro", "settings.json")
 }
 func loadSettings(fallback desktopSettings) desktopSettings {
 	path := settingsPath()
@@ -230,7 +230,7 @@ func findRoot() string {
 	}
 	return "."
 }
-func (w *window) alert(s string) { walk.MsgBox(w.mw, "JevCanCode", s, walk.MsgBoxIconError) }
+func (w *window) alert(s string) { walk.MsgBox(w.mw, "Tessaro", s, walk.MsgBoxIconError) }
 func (w *window) chooseFile(edit *walk.LineEdit) {
 	d := new(walk.FileDialog)
 	d.Filter = "JSON 파일 (*.json)|*.json|모든 파일 (*.*)|*.*"

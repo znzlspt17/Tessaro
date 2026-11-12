@@ -8,8 +8,8 @@
 coverage.out
 coverage.html
 *.prof
-/cmd/desktop/jev_desktop.syso
-/internal/desktop/jev_desktop_test.syso
+/cmd/desktop/tessaro_desktop.syso
+/internal/desktop/tessaro_desktop_test.syso
 
 # 로컬 opt-in 메모리 측정 도구
 /internal/desktop/trace_index_probe_windows_test.go

@@ -3,7 +3,7 @@ package tokenverify
 import (
 	"context"
 	"encoding/json"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"os"
 	"path/filepath"
 	"strings"

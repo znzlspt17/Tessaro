@@ -3,9 +3,9 @@ package desktop
 import (
 	"encoding/json"
 	"fmt"
-	"jevcancode/internal/application"
-	"jevcancode/internal/synth"
-	"jevcancode/internal/tokensynth"
+	"tessaro/internal/application"
+	"tessaro/internal/synth"
+	"tessaro/internal/tokensynth"
 	"strings"
 	"unicode/utf16"
 )

@@ -1,7 +1,7 @@
 package tokenverify
 
 import (
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"strings"
 	"testing"
 )

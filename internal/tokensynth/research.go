@@ -10,9 +10,9 @@ import (
 	"sort"
 	"strconv"
 
-	"jevcancode/internal/rank"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/tokenverify"
+	"tessaro/internal/rank"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/tokenverify"
 )
 
 type searchNode struct {

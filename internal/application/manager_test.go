@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/runner"
-	"jevcancode/internal/tokensynth"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
+	"tessaro/internal/runner"
+	"tessaro/internal/tokensynth"
 )
 
 type blockingRanker struct{ entered chan struct{} }

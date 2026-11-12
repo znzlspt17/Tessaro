@@ -10,9 +10,9 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
-	"jevcancode/internal/process"
-	"jevcancode/internal/spec"
-	"jevcancode/internal/synth"
+	"tessaro/internal/process"
+	"tessaro/internal/spec"
+	"tessaro/internal/synth"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -256,7 +256,7 @@ func check(ctx context.Context, p spec.Problem, body string, tests []spec.Test, 
 	if len(tests) == 0 {
 		return false, fmt.Errorf("tests required")
 	}
-	dir, err := os.MkdirTemp("", "jevcancode-*")
+	dir, err := os.MkdirTemp("", "tessaro-*")
 	if err != nil {
 		return false, err
 	}

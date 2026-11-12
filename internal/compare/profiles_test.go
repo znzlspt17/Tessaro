@@ -2,7 +2,7 @@ package compare
 
 import (
 	"context"
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 	"testing"
 )
 

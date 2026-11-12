@@ -2,7 +2,7 @@ package desktop
 
 import (
 	"encoding/json"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"strings"
 	"testing"
 )

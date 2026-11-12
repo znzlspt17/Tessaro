@@ -3,8 +3,8 @@ package verify
 import (
 	"context"
 	"encoding/json"
-	"jevcancode/internal/benchmark"
-	"jevcancode/internal/spec"
+	"tessaro/internal/benchmark"
+	"tessaro/internal/spec"
 	"os"
 	"path/filepath"
 	"testing"

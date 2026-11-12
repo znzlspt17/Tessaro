@@ -1,8 +1,8 @@
-# JevCanCode
+# Tessaro
 
 자연어 설명과 입출력 사례를 바탕으로 Go 함수를 탐색하고, 코드가 만들어지는 과정을 관찰하는 Windows 11 네이티브 프로그램입니다.
 
-`JevCanCode.exe`에서 실행·기록·모델 비교·후보 벤치마크를 다룹니다. GUI와 Go 탐색 엔진은 같은 프로세스에서 동작합니다. Decider는 프로그램이 관리하는 Python 추론 워커로 실행하며 로컬 서버나 브라우저를 사용하지 않습니다.
+`Tessaro.exe`에서 실행·기록·모델 비교·후보 벤치마크를 다룹니다. GUI와 Go 탐색 엔진은 같은 프로세스에서 동작합니다. Decider는 프로그램이 관리하는 Python 추론 워커로 실행하며 로컬 서버나 브라우저를 사용하지 않습니다.
 
 ## 실행
 
@@ -12,7 +12,7 @@
 .\scripts\build-desktop.ps1
 ```
 
-생성된 `dist/JevCanCode.exe`를 더블클릭하세요. 설정에서 프로젝트·출력·Python·모델 경로를 확인할 수 있습니다. 현재 PC의 `.venv-rocm72`와 `runtime/models/decider-4b`를 재사용합니다. 다른 PC용 설치 프로그램이나 모델은 포함하지 않습니다.
+생성된 `dist/Tessaro.exe`를 더블클릭하세요. 설정에서 프로젝트·출력·Python·모델 경로를 확인할 수 있습니다. 현재 PC의 `.venv-rocm72`와 `runtime/models/decider-4b`를 재사용합니다. 다른 PC용 설치 프로그램이나 모델은 포함하지 않습니다.
 
 생성 코드의 컴파일·실행 검증에는 Go 도구가 필요합니다. 로컬 모델 환경 준비는 [런타임 안내](runtime/README.md)를 참고하세요. 이미 준비된 환경은 다시 설치하거나 다운로드할 필요가 없습니다.
 

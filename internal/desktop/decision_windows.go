@@ -4,7 +4,7 @@ package desktop
 
 import (
 	"fmt"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"strings"
 	"unicode/utf16"
 

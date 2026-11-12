@@ -6,7 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"strings"
 )
 

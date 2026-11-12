@@ -3,8 +3,8 @@ package desktop
 import (
 	"encoding/json"
 	"fmt"
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
 	"strings"
 )
 

@@ -13,11 +13,11 @@ import (
 	"sync"
 	"time"
 
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/modelprovider"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/runner"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
+	"tessaro/internal/modelprovider"
+	"tessaro/internal/rank"
+	"tessaro/internal/runner"
 )
 
 type resolver func(context.Context, compare.Model) (rank.Ranker, error)

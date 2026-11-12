@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/runner"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
+	"tessaro/internal/runner"
 )
 
 func fixtureResolver(context.Context, compare.Model) (rank.Ranker, error) { return rank.Fake{}, nil }

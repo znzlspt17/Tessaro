@@ -1,7 +1,7 @@
 package tokensynth
 
 import (
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"testing"
 )
 

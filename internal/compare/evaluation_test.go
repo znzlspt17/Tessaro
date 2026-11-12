@@ -3,8 +3,8 @@ package compare
 import (
 	"context"
 	"encoding/json"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/runner"
+	"tessaro/internal/rank"
+	"tessaro/internal/runner"
 	"os"
 	"path/filepath"
 	"strings"

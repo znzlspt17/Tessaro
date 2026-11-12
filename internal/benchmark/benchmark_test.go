@@ -3,7 +3,7 @@ package benchmark
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 	"strings"
 	"testing"
 )

@@ -3,8 +3,8 @@ package tokensynth
 import (
 	"context"
 	"fmt"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/rank"
+	"tessaro/internal/tokenspec"
 	"sort"
 	"strconv"
 	"strings"

@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"jevcancode/internal/process"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/verify"
+	"tessaro/internal/process"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/verify"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,7 +41,7 @@ func EvaluatePublic(ctx context.Context, p tokenspec.Problem, source string, tes
 	if err != nil {
 		return result, err
 	}
-	dir, err := os.MkdirTemp("", "jevcancode-public-*")
+	dir, err := os.MkdirTemp("", "tessaro-public-*")
 	if err != nil {
 		return result, err
 	}

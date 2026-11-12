@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"jevcancode/internal/jsoninput"
-	"jevcancode/internal/rank"
+	"tessaro/internal/jsoninput"
+	"tessaro/internal/rank"
 	"sort"
 	"time"
 )

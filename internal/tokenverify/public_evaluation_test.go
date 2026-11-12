@@ -2,7 +2,7 @@ package tokenverify
 
 import (
 	"context"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"os"
 	"os/exec"
 	"path/filepath"

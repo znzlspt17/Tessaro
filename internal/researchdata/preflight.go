@@ -9,8 +9,8 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
-	"jevcancode/internal/tokenspec"
-	"jevcancode/internal/tokenverify"
+	"tessaro/internal/tokenspec"
+	"tessaro/internal/tokenverify"
 	"os"
 	"path/filepath"
 )

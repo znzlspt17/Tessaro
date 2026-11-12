@@ -25,7 +25,7 @@ func TestAppJobKillsInheritedChildOnParentTermination(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	parent := exec.CommandContext(ctx, exe, "-test.run=^TestJobHelperProcess$")
-	parent.Env = []string{"JEVCANCODE_JOB_HELPER=parent"}
+	parent.Env = []string{"TESSARO_JOB_HELPER=parent"}
 	pipe, err := parent.StdoutPipe()
 	if err != nil {
 		t.Fatal(err)
@@ -56,7 +56,7 @@ func TestAppJobKillsInheritedChildOnParentTermination(t *testing.T) {
 }
 
 func TestJobHelperProcess(t *testing.T) {
-	switch os.Getenv("JEVCANCODE_JOB_HELPER") {
+	switch os.Getenv("TESSARO_JOB_HELPER") {
 	case "parent":
 		if err := ProtectApp(); err != nil {
 			os.Exit(21)
@@ -66,7 +66,7 @@ func TestJobHelperProcess(t *testing.T) {
 			os.Exit(22)
 		}
 		child := exec.Command(exe, "-test.run=^TestJobHelperProcess$")
-		child.Env = []string{"JEVCANCODE_JOB_HELPER=child"}
+		child.Env = []string{"TESSARO_JOB_HELPER=child"}
 		// 별도 Group 없이도 부모의 보호 Job을 생성 순간부터 상속해야 한다.
 		if err = child.Start(); err != nil {
 			os.Exit(23)

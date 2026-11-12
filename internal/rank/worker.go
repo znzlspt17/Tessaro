@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"jevcancode/internal/process"
+	"tessaro/internal/process"
 )
 
 var errWorkerUnavailable = errors.New("worker_unavailable")

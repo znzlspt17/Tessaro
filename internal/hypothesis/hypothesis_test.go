@@ -2,8 +2,8 @@ package hypothesis
 
 import (
 	"context"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/tokensynth"
+	"tessaro/internal/rank"
+	"tessaro/internal/tokensynth"
 	"os"
 	"path/filepath"
 	"reflect"

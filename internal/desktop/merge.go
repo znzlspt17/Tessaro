@@ -2,7 +2,7 @@ package desktop
 
 import (
 	"encoding/json"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 )
 
 func MergeSnapshot(frames []Frame, s application.Snapshot) []Frame {

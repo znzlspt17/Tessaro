@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 )
 
 func TestExportTraceStreamsEquivalentEventsAndPreservesTargetOnError(t *testing.T) {

@@ -17,8 +17,8 @@ import (
 	"time"
 
 	"golang.org/x/sys/windows"
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
 )
 
 // 2026-11-12: 신호 발신 프로세스만 격리된 자식 콘솔에 붙여 사용자 콘솔에는 영향을 주지 않는다.

@@ -5,7 +5,7 @@ import (
 	"math"
 	"testing"
 
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 )
 
 type decisionRankerFixture struct{}

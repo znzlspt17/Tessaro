@@ -3,9 +3,9 @@ package researchresults
 import (
 	"encoding/json"
 	"fmt"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/runner"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
+	"tessaro/internal/runner"
 	"os"
 	"path/filepath"
 	"strings"

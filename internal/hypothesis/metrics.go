@@ -2,7 +2,7 @@ package hypothesis
 
 import (
 	"errors"
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 	"math"
 	"math/rand"
 	"sort"

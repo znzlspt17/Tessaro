@@ -10,8 +10,8 @@ import (
 
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
-	"jevcancode/internal/application"
-	"jevcancode/internal/researchresults"
+	"tessaro/internal/application"
+	"tessaro/internal/researchresults"
 )
 
 type researchTable struct {

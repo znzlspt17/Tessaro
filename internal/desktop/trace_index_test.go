@@ -3,7 +3,7 @@ package desktop
 import (
 	"context"
 	"fmt"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"reflect"
 	"strings"
 	"testing"

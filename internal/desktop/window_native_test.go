@@ -5,13 +5,14 @@ package desktop
 import (
 	"encoding/json"
 	"flag"
-	"jevcancode/internal/application"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/researchresults"
-	"jevcancode/internal/runner"
-	"jevcancode/internal/tokenspec"
+	"path/filepath"
 	"runtime"
 	"strings"
+	"tessaro/internal/application"
+	"tessaro/internal/compare"
+	"tessaro/internal/researchresults"
+	"tessaro/internal/runner"
+	"tessaro/internal/tokenspec"
 	"testing"
 )
 
@@ -28,6 +29,9 @@ func TestNativeWindowDefaultValues(t *testing.T) {
 		t.Fatal("window creation failed")
 	}
 	defer w.mw.Dispose()
+	if got := w.mw.Title(); got != "Tessaro" {
+		t.Errorf("window title = %q", got)
+	}
 	checks := []struct {
 		name      string
 		got, want float64
@@ -103,5 +107,11 @@ func checkNativeResearchControls(t *testing.T, w *window) {
 	_ = v.trials.SetCurrentIndex(0)
 	if !strings.Contains(v.detail.Text(), "return x") {
 		t.Fatalf("trial details missing source: %q", v.detail.Text())
+	}
+}
+
+func TestSettingsPathUsesTessaroDirectory(t *testing.T) {
+	if got := settingsPath(); got != "" && filepath.Base(filepath.Dir(got)) != "Tessaro" {
+		t.Fatalf("settings directory = %s", filepath.Base(filepath.Dir(got)))
 	}
 }

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
 )
 
 type cancellingHypothesisRanker struct {

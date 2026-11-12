@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $steps = [System.Collections.Generic.List[object]]::new()
-$oldSmoke = [Environment]::GetEnvironmentVariable('JEVCANCODE_GPU_SMOKE', 'Process')
+$oldSmoke = [Environment]::GetEnvironmentVariable('TESSARO_GPU_SMOKE', 'Process')
 
 function Invoke-Check([string]$Name, [scriptblock]$Action) {
     $timer = [Diagnostics.Stopwatch]::StartNew()
@@ -26,7 +26,7 @@ function Invoke-Check([string]$Name, [scriptblock]$Action) {
 }
 
 try {
-    [Environment]::SetEnvironmentVariable('JEVCANCODE_GPU_SMOKE', '0', 'Process')
+    [Environment]::SetEnvironmentVariable('TESSARO_GPU_SMOKE', '0', 'Process')
     Push-Location $root
     Invoke-Check 'go-test' { & go test ./... }
     Invoke-Check 'python-unittest' { & $PythonPath -m unittest discover -s runtime -p test_local_worker.py }
@@ -52,7 +52,7 @@ try {
     }
 } finally {
     Pop-Location
-    [Environment]::SetEnvironmentVariable('JEVCANCODE_GPU_SMOKE', $oldSmoke, 'Process')
+    [Environment]::SetEnvironmentVariable('TESSARO_GPU_SMOKE', $oldSmoke, 'Process')
 }
 $failed = @($steps | Where-Object status -eq 'failed').Count -gt 0
 [pscustomobject]@{ status = $(if ($failed) { 'failed' } else { 'passed' }); steps = @($steps.ToArray()) } | ConvertTo-Json -Depth 5

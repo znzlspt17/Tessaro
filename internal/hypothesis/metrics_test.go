@@ -1,7 +1,7 @@
 package hypothesis
 
 import (
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 	"math"
 	"reflect"
 	"testing"

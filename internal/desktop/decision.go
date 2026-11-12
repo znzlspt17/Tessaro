@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go/scanner"
 	"go/token"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"sort"
 	"strings"
 	"unicode/utf16"

@@ -3,8 +3,8 @@ package synth
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/spec"
+	"tessaro/internal/rank"
+	"tessaro/internal/spec"
 	"strings"
 	"testing"
 )

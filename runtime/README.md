@@ -6,7 +6,7 @@ RX 9070 XT에서 Decider-4B를 Windows 네이티브로 실행하는 경로입니
 .\runtime\setup.ps1
 .venv-rocm72\Scripts\python.exe -I runtime\download_model.py
 .venv-rocm72\Scripts\python.exe -I runtime\gpu_probe.py --model-dir runtime\models\decider-4b --repeats 3
-# 준비가 끝나면 JevCanCode.exe에서 Decider를 선택합니다.
+# 준비가 끝나면 Tessaro.exe에서 Decider를 선택합니다.
 ```
 
 모델 다운로드는 약 8.4GB이며 공개 revision `585473dec4fa93f0325c2bf02dda7273b61f44c1`을 사용합니다. `token=False`로 인증 없이 받으며, 추론 시에는 offline 설정을 적용합니다. 모델 파일과 Python 환경은 Git 대상에서 제외됩니다. 이미 준비된 환경에서는 설치·다운로드를 반복할 필요가 없습니다.

@@ -3,7 +3,7 @@ package desktop
 import (
 	"encoding/json"
 	"fmt"
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 	"testing"
 )
 

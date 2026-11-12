@@ -3,9 +3,9 @@ package tokensynth
 import (
 	"context"
 	"encoding/json"
-	"jevcancode/internal/grammar"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/grammar"
+	"tessaro/internal/rank"
+	"tessaro/internal/tokenspec"
 	"os"
 	"reflect"
 	"strings"

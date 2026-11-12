@@ -1,7 +1,7 @@
 package verify
 
 import (
-	"jevcancode/internal/spec"
+	"tessaro/internal/spec"
 	"testing"
 )
 

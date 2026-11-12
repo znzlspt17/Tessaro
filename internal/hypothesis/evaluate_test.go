@@ -3,8 +3,8 @@ package hypothesis
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/rank"
+	"tessaro/internal/compare"
+	"tessaro/internal/rank"
 	"os"
 	"path/filepath"
 	"testing"

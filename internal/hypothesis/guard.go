@@ -3,7 +3,7 @@ package hypothesis
 import (
 	"context"
 	"errors"
-	"jevcancode/internal/rank"
+	"tessaro/internal/rank"
 )
 
 var errRequestBudget = errors.New("request_budget_exhausted")

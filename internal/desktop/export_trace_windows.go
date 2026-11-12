@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"jevcancode/internal/application"
+	"tessaro/internal/application"
 )
 
 // 2026-11-08: 큰 trace도 원본을 배치 단위로 읽어 내보내기 메모리를 제한한다.

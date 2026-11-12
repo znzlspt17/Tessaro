@@ -3,8 +3,8 @@ package researchdata
 import (
 	"bytes"
 	"encoding/json"
-	"jevcancode/internal/compare"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/compare"
+	"tessaro/internal/tokenspec"
 	"os"
 	"path/filepath"
 	"reflect"

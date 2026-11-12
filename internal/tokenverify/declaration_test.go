@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"go/scanner"
 	"go/token"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/tokenspec"
 	"os"
 	"path/filepath"
 	"strings"

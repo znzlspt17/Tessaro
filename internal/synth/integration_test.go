@@ -2,10 +2,10 @@ package synth_test
 
 import (
 	"context"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/spec"
-	"jevcancode/internal/synth"
-	"jevcancode/internal/verify"
+	"tessaro/internal/rank"
+	"tessaro/internal/spec"
+	"tessaro/internal/synth"
+	"tessaro/internal/verify"
 	"strings"
 	"testing"
 	"time"

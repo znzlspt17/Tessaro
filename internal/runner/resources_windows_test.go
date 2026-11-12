@@ -5,9 +5,9 @@ package runner
 import (
 	"context"
 	"encoding/json"
-	"jevcancode/internal/rank"
-	"jevcancode/internal/spec"
-	"jevcancode/internal/tokenspec"
+	"tessaro/internal/rank"
+	"tessaro/internal/spec"
+	"tessaro/internal/tokenspec"
 	"testing"
 )
 
