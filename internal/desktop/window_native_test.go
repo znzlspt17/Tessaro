@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"flag"
 	"jevcancode/internal/application"
+	"jevcancode/internal/compare"
+	"jevcancode/internal/researchresults"
+	"jevcancode/internal/runner"
 	"jevcancode/internal/tokenspec"
 	"runtime"
 	"strings"
@@ -35,6 +38,7 @@ func TestNativeWindowDefaultValues(t *testing.T) {
 		t.Errorf("run options = %+v", got)
 	}
 	checkNativeStrategyChoicesFollowEngine(t)
+	checkNativeResearchControls(t, w)
 	for _, c := range checks {
 		if c.got != c.want {
 			t.Errorf("%s: got %v want %v", c.name, c.got, c.want)
@@ -82,5 +86,22 @@ func checkNativeStrategyChoicesFollowEngine(t *testing.T) {
 	_ = w.engine.SetCurrentIndex(1)
 	if got := w.strategy.CurrentIndex(); got != 1 {
 		t.Errorf("shared strategy index = %d", got)
+	}
+}
+
+func checkNativeResearchControls(t *testing.T, w *window) {
+	t.Helper()
+	v := w.research
+	if v == nil || v.path == nil || v.trials == nil {
+		t.Fatal("research controls missing")
+	}
+	v.study = researchresults.Study{Strategies: []researchresults.StrategySummary{{Strategy: "beam", All: researchresults.Metrics{Planned: 2, Success: 1}, Dev: researchresults.Metrics{Planned: 1, Success: 1}}}, Trials: []researchresults.Trial{{Split: "dev", Outcome: compare.Outcome{Trial: compare.Trial{Strategy: "beam", Problem: "p", Seed: 42}, Result: runner.Result{Status: "success", Source: "return x"}}}, {Split: "eval", Outcome: compare.Outcome{Trial: compare.Trial{Strategy: "beam", Problem: "q"}, Result: runner.Result{Status: "failed"}}}}}
+	_ = v.split.SetCurrentIndex(1)
+	if len(v.rows) != 1 || v.summaryModel.RowCount() != 1 {
+		t.Fatalf("dev rows %d summary %d", len(v.rows), v.summaryModel.RowCount())
+	}
+	_ = v.trials.SetCurrentIndex(0)
+	if !strings.Contains(v.detail.Text(), "return x") {
+		t.Fatalf("trial details missing source: %q", v.detail.Text())
 	}
 }

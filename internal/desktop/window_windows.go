@@ -23,6 +23,7 @@ import (
 )
 
 type window struct {
+	research                                                                               *researchView
 	mw                                                                                     *walk.MainWindow
 	manager                                                                                *application.Manager
 	provider                                                                               *modelprovider.Provider
@@ -96,6 +97,7 @@ func Run() error {
 	w.loadManifest()
 	w.loadHistory()
 	w.watch()
+	w.loadResearch()
 	tickStop := make(chan struct{})
 	go func() {
 		t := time.NewTicker(500 * time.Millisecond)
@@ -138,6 +140,7 @@ func newWindow(settings desktopSettings) (*window, error) {
 	err = MainWindow{AssignTo: &w.mw, Title: "JevCanCode", Font: Font{Family: "맑은 고딕", PointSize: 10}, MinSize: Size{Width: 900, Height: 650}, Size: Size{Width: 1320, Height: 850}, Layout: VBox{}, Children: []Widget{
 		TabWidget{AssignTo: &w.mainTabs, Pages: []TabPage{
 			w.searchPage(),
+			w.researchPage(settings.Project),
 			{Title: "기록", Layout: VBox{}, Children: []Widget{Composite{Layout: HBox{}, Children: []Widget{PushButton{Text: "새로고침", OnClicked: w.loadHistory}, Label{Text: "문제 ID 필터"}, LineEdit{AssignTo: &w.historyFilter, OnTextChanged: func() { w.refreshFrames() }}, PushButton{Text: "선택 기록 열기", OnClicked: w.openHistory}, PushButton{Text: "JSON 내보내기", OnClicked: w.exportHistory}, PushButton{Text: "Trace 내보내기", OnClicked: w.exportTrace}, PushButton{Text: "성공 코드 내보내기", OnClicked: w.exportCode}, PushButton{Text: "클립보드 복사", OnClicked: func() { _ = walk.Clipboard().SetText(w.historyText.Text()) }}}}, HSplitter{Children: []Widget{ListBox{AssignTo: &w.historyList}, TextEdit{AssignTo: &w.historyText, ReadOnly: true, VScroll: true, HScroll: true}}}}},
 			{Title: "비교 / 벤치마크", Layout: VBox{}, Children: []Widget{Label{Text: "비교 모델 ID (쉼표로 구분; 빈칸이면 선택 모델)"}, LineEdit{AssignTo: &w.compareModels}, Label{Text: "전략 (쉼표로 구분)"}, LineEdit{AssignTo: &w.compareStrategies, Text: "greedy,beam"}, Label{Text: "반복 횟수"}, NumberEdit{AssignTo: &w.repeats, MinValue: 1, MaxValue: 10000, Value: 1.0}, Label{Text: "설정의 manifest와 선택한 엔진을 사용합니다. 진행 및 결과는 탐색 탭과 기록에서 확인할 수 있습니다."}, Composite{Layout: HBox{}, Children: []Widget{PushButton{Text: "비교 시작", OnClicked: func() { w.start("compare") }}, PushButton{Text: "벤치마크 시작", OnClicked: func() { w.start("benchmark") }}, PushButton{Text: "중지", OnClicked: w.cancel}, HSpacer{}}}, Label{Text: "가설 검증: 40문제 · Jev 1.14.0 · 최대10,000회 API 요청 · 실제요금발생"}, Label{Text: "선택 모델과 관계없이 전용 manifest의 Jev를 사용합니다."}, Composite{Layout: HBox{}, Children: []Widget{PushButton{Text: "가설 검증 시작", OnClicked: func() { w.start("hypothesis") }}, PushButton{Text: "중지", OnClicked: w.cancel}, PushButton{Text: "결과 열기", OnClicked: w.showHypothesisResult}, HSpacer{}}}, Label{AssignTo: &w.hypothesisStatus, Text: "준비"}}},
 			{Title: "설정", Layout: VBox{}, Children: []Widget{
