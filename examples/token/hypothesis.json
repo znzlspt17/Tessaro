@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "model": {
+    "id": "jev",
+    "ranker": "jev",
+    "model": "jev-1.14.0",
+    "key_env": "TYPESAFE_API_KEY"
+  },
+  "references": "references.json",
+  "problems": [
+    {
+      "id": "arithmetic-add",
+      "spec": "specs/arithmetic-add.json",
+      "heldout": "heldout/arithmetic-add.json"
+    },
+    {
+      "id": "arithmetic-subtract",
+      "spec": "specs/arithmetic-subtract.json",
+      "heldout": "heldout/arithmetic-subtract.json"
+    },
+    {
+      "id": "arithmetic-multiply",
+      "spec": "specs/arithmetic-multiply.json",
+      "heldout": "heldout/arithmetic-multiply.json"
+    },
+    {
+      "id": "arithmetic-quotient",
+      "spec": "specs/arithmetic-quotient.json",
+      "heldout": "heldout/arithmetic-quotient.json"
+    },
+    {
+      "id": "comparison-less",
+      "spec": "specs/comparison-less.json",
+      "heldout": "heldout/comparison-less.json"
+    },
+    {
+      "id": "comparison-greater",
+      "spec": "specs/comparison-greater.json",
+      "heldout": "heldout/comparison-greater.json"
+    },
+    {
+      "id": "comparison-equal",
+      "spec": "specs/comparison-equal.json",
+      "heldout": "heldout/comparison-equal.json"
+    },
+    {
+      "id": "comparison-nonnegative",
+      "spec": "specs/comparison-nonnegative.json",
+      "heldout": "heldout/comparison-nonnegative.json"
+    },
+    {
+      "id": "boolean-not",
+      "spec": "specs/boolean-not.json"
+    },
+    {
+      "id": "boolean-and",
+      "spec": "specs/boolean-and.json"
+    },
+    {
+      "id": "boolean-or",
+      "spec": "specs/boolean-or.json"
+    },
+    {
+      "id": "boolean-xor",
+      "spec": "specs/boolean-xor.json"
+    },
+    {
+      "id": "conditional-abs",
+      "spec": "specs/conditional-abs.json",
+      "heldout": "heldout/conditional-abs.json"
+    },
+    {
+      "id": "conditional-max",
+      "spec": "specs/conditional-max.json",
+      "heldout": "heldout/conditional-max.json"
+    },
+    {
+      "id": "conditional-min",
+      "spec": "specs/conditional-min.json",
+      "heldout": "heldout/conditional-min.json"
+    },
+    {
+      "id": "conditional-clamp",
+      "spec": "specs/conditional-clamp.json",
+      "heldout": "heldout/conditional-clamp.json"
+    },
+    {
+      "id": "composition-affine",
+      "spec": "specs/composition-affine.json",
+      "heldout": "heldout/composition-affine.json"
+    },
+    {
+      "id": "composition-square-plus",
+      "spec": "specs/composition-square-plus.json",
+      "heldout": "heldout/composition-square-plus.json"
+    },
+    {
+      "id": "composition-sum-three",
+      "spec": "specs/composition-sum-three.json",
+      "heldout": "heldout/composition-sum-three.json"
+    },
+    {
+      "id": "composition-difference-product",
+      "spec": "specs/composition-difference-product.json",
+      "heldout": "heldout/composition-difference-product.json"
+    },
+    {
+      "id": "scope-branch-local",
+      "spec": "specs/scope-branch-local.json",
+      "heldout": "heldout/scope-branch-local.json"
+    },
+    {
+      "id": "scope-conditional-update",
+      "spec": "specs/scope-conditional-update.json",
+      "heldout": "heldout/scope-conditional-update.json"
+    },
+    {
+      "id": "scope-two-locals",
+      "spec": "specs/scope-two-locals.json",
+      "heldout": "heldout/scope-two-locals.json"
+    },
+    {
+      "id": "scope-boolean-update",
+      "spec": "specs/scope-boolean-update.json"
+    },
+    {
+      "id": "string-length",
+      "spec": "specs/string-length.json",
+      "heldout": "heldout/string-length.json"
+    },
+    {
+      "id": "string-first-byte",
+      "spec": "specs/string-first-byte.json",
+      "heldout": "heldout/string-first-byte.json"
+    },
+    {
+      "id": "string-concat",
+      "spec": "specs/string-concat.json",
+      "heldout": "heldout/string-concat.json"
+    },
+    {
+      "id": "string-equal",
+      "spec": "specs/string-equal.json",
+      "heldout": "heldout/string-equal.json"
+    },
+    {
+      "id": "slice-sum",
+      "spec": "specs/slice-sum.json",
+      "heldout": "heldout/slice-sum.json"
+    },
+    {
+      "id": "slice-positive-count",
+      "spec": "specs/slice-positive-count.json",
+      "heldout": "heldout/slice-positive-count.json"
+    },
+    {
+      "id": "slice-string-count",
+      "spec": "specs/slice-string-count.json",
+      "heldout": "heldout/slice-string-count.json"
+    },
+    {
+      "id": "slice-reverse",
+      "spec": "specs/slice-reverse.json",
+      "heldout": "heldout/slice-reverse.json"
+    },
+    {
+      "id": "map-int-lookup",
+      "spec": "specs/map-int-lookup.json",
+      "heldout": "heldout/map-int-lookup.json"
+    },
+    {
+      "id": "map-int-sum",
+      "spec": "specs/map-int-sum.json",
+      "heldout": "heldout/map-int-sum.json"
+    },
+    {
+      "id": "map-string-lookup",
+      "spec": "specs/map-string-lookup.json",
+      "heldout": "heldout/map-string-lookup.json"
+    },
+    {
+      "id": "map-remove-zero",
+      "spec": "specs/map-remove-zero.json",
+      "heldout": "heldout/map-remove-zero.json"
+    },
+    {
+      "id": "identity",
+      "spec": "specs/identity.json",
+      "heldout": "heldout/identity.json"
+    },
+    {
+      "id": "loop-factorial",
+      "spec": "specs/loop-factorial.json",
+      "heldout": "heldout/loop-factorial.json"
+    },
+    {
+      "id": "loop-sum-to-n",
+      "spec": "specs/loop-sum-to-n.json",
+      "heldout": "heldout/loop-sum-to-n.json"
+    },
+    {
+      "id": "loop-count-even",
+      "spec": "specs/loop-count-even.json",
+      "heldout": "heldout/loop-count-even.json"
+    }
+  ],
+  "seed": 42,
+  "budgets": {
+    "request_limit": 10000,
+    "samples_per_problem": 48,
+    "max_calls": 64,
+    "max_tokens": 256,
+    "max_candidates": 8192,
+    "timeout_seconds": 300
+  }
+}
